@@ -7,3 +7,4 @@ connector.use_db()
 pizza = CategoryManager(connector, "Pizzas")
 pizza.insert()
 pizza.select()
+"je suis nul avec git"
