@@ -105,22 +105,22 @@ class ProductManager:
     def update(self, id_product, item_update, value_item):
         req = ""
         if item_update == "name_product":
-            req = "UPDATE Categories SET name_product= %s " \
+            req = "UPDATE Product SET name_product= %s " \
                   "WHERE id = %s"
         elif item_update == "brand":
-            req = "UPDATE Categories SET brand= %s " \
+            req = "UPDATE Product SET brand= %s " \
                   "WHERE id = %s"
         elif item_update == "categoy_id":
-            req = "UPDATE Categories SET category_id= %s " \
+            req = "UPDATE Product SET category_id= %s " \
                   "WHERE id = %s"
         elif item_update == "nutri_score":
-            req = "UPDATE Categories SET nutri_score= %s " \
+            req = "UPDATE Product SET nutri_score= %s " \
                   "WHERE id = %s"
         elif item_update == "store":
-            req = "UPDATE Categories SET store= %s " \
+            req = "UPDATE Product SET store= %s " \
                   "WHERE id = %s"
         elif item_update == "ingredient":
-            req = "UPDATE Categories SET ingredient= %s " \
+            req = "UPDATE Product SET ingredient= %s " \
                   "WHERE id = %s"
         self.connector.execute_info(req, (value_item, id_product))
 

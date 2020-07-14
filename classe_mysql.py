@@ -30,8 +30,13 @@ class MysqlConnector:
         cursor = self.connexion.cursor()
         cursor.execute(req)
         select = cursor.fetchall()
-        for x in select:
-            print("Catégorie {} : {}".format(x[0], x[1]))
+        cursor.close()
+        return select
+
+    def select_info(self, req, info):
+        cursor = self.connexion.cursor()
+        cursor.execute(req, info)
+        select = cursor.fetchall()
         cursor.close()
         return select
 
