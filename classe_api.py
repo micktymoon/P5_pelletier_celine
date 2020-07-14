@@ -2,30 +2,14 @@ import json
 import requests
 
 
-# response = requests.get("https://fr.openfoodfacts.org/categories.json")
-# category = json.loads(response.text)
-# l = len(category["tags"])
-# print(l)
-# i = 0
-# listcat = []
-# while i < l:
-#     path = category["tags"][i]
-#
-#     for item in path:
-#         if item == "name":
-#             listcat.append(path[item])
-#
-#     i += 1
-# print(listcat)
-
-
 class ApiSearch:
 
     def __init__(self):
-        self.api_search = "https://fr.openfoodfacts.org/cgi/search.pl?action=process&json=1&search_terms="
+        self.api_search_terms = "https://fr.openfoodfacts.org/cgi/search.pl?action=process&json=1&search_terms="
+        self.api_search_cat = "https://fr.openfoodfacts.org/categories.json"
 
-    def search_product_by_cate(self, name_product):
-        final_http = self.api_search + name_product
+    def search_product(self, name_product):
+        final_http = self.api_search_terms + name_product
         response = requests.get(final_http)
         response_text = json.loads(response.text)
         path = response_text["products"][0]
@@ -46,6 +30,9 @@ class ApiSearch:
                     final_product["category_id"] = 25
                 elif "en:cheeses" in path["categories_tags"]:
                     final_product["category_id"] = 26
+                else:
+                    final_product["category_id"] = None
+
             if items == "nutriscore_grade":
                 final_product["nutri_score"] = path["nutriscore_grade"]
             if items == "stores":
@@ -54,9 +41,26 @@ class ApiSearch:
                 final_product["ingredients"] = path["ingredients_text"]
         return final_product
 
+    def search_cat(self, name_cat):
+        response = requests.get(self.api_search_cat)
+        response_text = json.loads(response.text)
+        len_response_text = len(response_text["tags"])
+        i = 0
+        listcat = []
+        while i < len_response_text:
+            path = response_text["tags"][i]
+            for item in path:
+                if item == "name":
+                    listcat.append(path[item])
+            i += 1
+        x = 0
+        list_cat_find = []
+        while x < len(listcat):
+            if name_cat in listcat[x]:
+                list_cat_find.append(listcat[x])
+            x += 1
+        return list_cat_find
 
-product = "prince"
-blabla = ApiSearch()
-prince = blabla.search_product_by_cate(product)
-print(prince["category_id"])
+
+
 
