@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+# -*-coding: utf8 -*-
+
+
 class DatabaseManager:
     """ """
     def __init__(self, connector):
@@ -42,7 +46,7 @@ class DatabaseManager:
         FOREIGN KEY (id_product) REFERENCES Product(id);
         ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_id_product_substitute 
         FOREIGN KEY (id_product_substitute) REFERENCES Product(id);"""
-        self.connector.execute_multi(req)
+        self.connector.execute(req, multi=1)
 
 
 class CategoryManager:
@@ -53,80 +57,65 @@ class CategoryManager:
 
     def delete(self, id_delete):
         req = "DELETE FROM Categories WHERE id = %s"
-        self.connector.execute_info(req, (id_delete,))
+        self.connector.execute(req, (id_delete,))
 
-    def insert(self):
+    def insert(self, category):
         req = "INSERT INTO Categories (name_cat) VALUES (%s)"
-        self.connector.execute_info(req, (self.name_category,))
+        id_ = self.connector.execute(req, (category["name"],))
+        category['id'] = id_
 
     def update(self, id_cat_update, name_cat_update):
         infos = (name_cat_update, id_cat_update)
         req = "UPDATE Categories SET name_cat= %s WHERE id = %s"
-        self.connector.execute_info(req, infos)
+        self.connector.execute(req, infos)
 
     def select(self):
         req = "SELECT * FROM Categories"
-        select = self.connector.select(req)
+        return self.connector.select(req)
         for x in select:
             print("id {} : {}".format(x[0], x[1]))
 
     def get(self, id_cat):
         req = "SELECT name_cat FROM Categories WHERE id = %s"
-        print(self.connector.select(req, (id_cat,)))
+        return self.connector.select(req, (id_cat,))
 
 
 class ProductManager:
 
-    def __init__(self, connector, name_product, brand, category_id, nutri_score, store, ingredient):
+    def __init__(self, connector):
 
         self.connector = connector
-        self.name_product = name_product
-        self.brand = brand
-        self.category_id = category_id
-        self.nutri_score = nutri_score
-        self.store = store
-        self.ingredient = ingredient
 
     def delete(self, id_delete):
         req = "DELETE FROM Product WHERE id = %s"
-        self.connector.execute_info(req, (id_delete,))
+        self.connector.execute(req, (id_delete,))
 
-    def insert(self):
+    def insert(self, product):
         req = "INSERT INTO Product " \
               "(name_product, brand, category_id, nutri_score, store, ingredient) " \
               "VALUES (%s, %s, %s, %s, %s, %s)"
-        self.connector.execute_info(req, (self.name_product,
-                                          self.brand,
-                                          self.category_id,
-                                          self.nutri_score,
-                                          self.store,
-                                          self.ingredient))
+        self.connector.execute(req, (product["name"],
+                                     product["brand"],
+                                     product["category_id"],
+                                     product["nutri_score"],
+                                     product["store"],
+                                     product["ingredient"]))
 
-    def update(self, id_product, item_update, value_item):
-        req = ""
-        if item_update == "name_product":
-            req = "UPDATE Product SET name_product= %s " \
-                  "WHERE id = %s"
-        elif item_update == "brand":
-            req = "UPDATE Product SET brand= %s " \
-                  "WHERE id = %s"
-        elif item_update == "categoy_id":
-            req = "UPDATE Product SET category_id= %s " \
-                  "WHERE id = %s"
-        elif item_update == "nutri_score":
-            req = "UPDATE Product SET nutri_score= %s " \
-                  "WHERE id = %s"
-        elif item_update == "store":
-            req = "UPDATE Product SET store= %s " \
-                  "WHERE id = %s"
-        elif item_update == "ingredient":
-            req = "UPDATE Product SET ingredient= %s " \
-                  "WHERE id = %s"
-        self.connector.execute_info(req, (value_item, id_product))
+    def update(self, product):
+        req = "UPDATE Product SET name_product=%s, brand=%s, category_id=%s, nutri_score=%s, store=%s, ingredient=%s" \
+              "WHERE id=%s"
+        self.connector.execute(req, (product["name"],
+                                     product["brand"],
+                                     product["category_id"],
+                                     product["nutri_score"],
+                                     product["store"],
+                                     product["ingredient"],
+                                     product["id"]))
 
     def select(self):
         req = "SELECT * FROM Product"
         select = self.connector.select(req)
+        return select
         for product in select:
             print("id : {} "
                   "name : {} "
@@ -140,7 +129,8 @@ class ProductManager:
         req = "SELECT name_product, brand, Categories.name_cat, nutri_score, store, ingredient FROM Product " \
               "INNER JOIN Categories ON Categories.id = Product.category_id " \
               "WHERE Product.id = %s"
-        select = self.connector.select_info(req, (id_product,))
+        select = self.connector.select(req, (id_product,))
+        return select
         for product in select:
             print("name : {} \n"
                   "brand : {} \n"
@@ -148,3 +138,9 @@ class ProductManager:
                   "nutriscore : {} \n"
                   "store : {} \n"
                   "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5]))
+
+pm = ProductManager()
+produit = pm.get('17')
+print(produit)
+produit['brand'] = 'sodebo'
+pm.update(produit)

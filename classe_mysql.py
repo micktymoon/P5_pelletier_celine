@@ -2,38 +2,28 @@ import mysql.connector
 
 
 class MysqlConnector:
+    """ Class that allows you to connect to MySQL and the database and execute SQL requests"""
 
     def __init__(self, host, user, password):
         self.connexion = mysql.connector.connect(host=host,
                                                  user=user,
                                                  password=password)
 
-    def execute(self, req):
+    def execute(self, req, info=(), **kwargs):
+        """
+        execute('sql')
+        execute('sql %s', ('toto'))
+        execute('sql1;sql2;', multi=1)
+        """
         cursor = self.connexion.cursor()
-        cursor.execute(req)
+        cursor.execute(req, info, **kwargs)
+        id_create = cursor.lastrowid
         self.connexion.commit()
         cursor.close()
+        if id_create:
+            return id_create
 
-    def execute_multi(self, req):
-        cursor = self.connexion.cursor()
-        cursor.execute(req, multi=1)
-        self.connexion.commit()
-        cursor.close()
-
-    def execute_info(self, req, info):
-        cursor = self.connexion.cursor()
-        cursor.execute(req, info)
-        self.connexion.commit()
-        cursor.close()
-
-    def select(self, req):
-        cursor = self.connexion.cursor()
-        cursor.execute(req)
-        select = cursor.fetchall()
-        cursor.close()
-        return select
-
-    def select_info(self, req, info):
+    def select(self, req, info=()):
         cursor = self.connexion.cursor()
         cursor.execute(req, info)
         select = cursor.fetchall()
@@ -42,8 +32,13 @@ class MysqlConnector:
 
     def use_db(self):
         cursor = self.connexion.cursor()
-        cursor.execute("USE purBeurre")
-        cursor.close()
+        try:
+            cursor.execute("USE purBeurre")
+            return True
+        except mysql.connector.Error:
+            return False
+        finally:
+            cursor.close()
 
 
 # connector = Mysql("localhost", "toto","tèto")
