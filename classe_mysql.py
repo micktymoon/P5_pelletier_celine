@@ -102,9 +102,9 @@ class MysqlConnector:
         """
         cursor = self.connexion.cursor()
         cursor.execute(req, info)
-        select = cursor.fetchall()
+        result = cursor.fetchall()
         cursor.close()
-        return select
+        return result
 
     def use_db(self):
         """
