@@ -17,9 +17,6 @@ class DatabaseManager:
 
     def create_table(self):
         req = """
-        DROP TABLE IF EXISTS Categories;
-        DROP TABLE IF EXISTS Product;
-        DROP TABLE IF EXISTS Substitute;
         CREATE TABLE Categories (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             name_cat VARCHAR(255) NOT NULL,

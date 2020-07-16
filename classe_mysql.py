@@ -2,9 +2,10 @@ import mysql.connector
 
 
 class MysqlConnector:
-    """ Class that allows you to connect to MySQL and the database and execute SQL requests"""
+    """ Class that allows you to connect to MySQL and execute SQL requests"""
 
     def __init__(self, host, user, password):
+        """MysqlConnector class constructor."""
         self.connexion = mysql.connector.connect(host=host,
                                                  user=user,
                                                  password=password)

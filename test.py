@@ -29,7 +29,7 @@ for cat in list_categories:
     category = {"name": cat}
     cm = CategoryManager(connector1)
     cm.insert(category)
-
+print("Les catégories ont été insérées")
 
 
 # product = "evian"
