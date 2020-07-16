@@ -51,9 +51,8 @@ class DatabaseManager:
 
 class CategoryManager:
 
-    def __init__(self, connector, category):
+    def __init__(self, connector):
         self.connector = connector
-        self.name_category = category
 
     def delete(self, id_delete):
         req = "DELETE FROM Categories WHERE id = %s"
@@ -72,8 +71,8 @@ class CategoryManager:
     def select(self):
         req = "SELECT * FROM Categories"
         return self.connector.select(req)
-        for x in select:
-            print("id {} : {}".format(x[0], x[1]))
+        # for x in select:
+        #     print("id {} : {}".format(x[0], x[1]))
 
     def get(self, id_cat):
         req = "SELECT name_cat FROM Categories WHERE id = %s"
@@ -116,14 +115,14 @@ class ProductManager:
         req = "SELECT * FROM Product"
         select = self.connector.select(req)
         return select
-        for product in select:
-            print("id : {} "
-                  "name : {} "
-                  "brand : {} "
-                  "category_id : {} "
-                  "nutriscore : {} "
-                  "store : {} "
-                  "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5], product[6]))
+        # for product in select:
+        #     print("id : {} "
+        #           "name : {} "
+        #           "brand : {} "
+        #           "category_id : {} "
+        #           "nutriscore : {} "
+        #           "store : {} "
+        #           "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5], product[6]))
 
     def get(self, id_product):
         req = "SELECT name_product, brand, Categories.name_cat, nutri_score, store, ingredient FROM Product " \
@@ -131,16 +130,16 @@ class ProductManager:
               "WHERE Product.id = %s"
         select = self.connector.select(req, (id_product,))
         return select
-        for product in select:
-            print("name : {} \n"
-                  "brand : {} \n"
-                  "category : {} \n"
-                  "nutriscore : {} \n"
-                  "store : {} \n"
-                  "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5]))
+        # for product in select:
+        #     print("name : {} \n"
+        #           "brand : {} \n"
+        #           "category : {} \n"
+        #           "nutriscore : {} \n"
+        #           "store : {} \n"
+        #           "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5]))
 
-pm = ProductManager()
-produit = pm.get('17')
-print(produit)
-produit['brand'] = 'sodebo'
-pm.update(produit)
+# pm = ProductManager()
+# produit = pm.get('17')
+# print(produit)
+# produit['brand'] = 'sodebo'
+# pm.update(produit)

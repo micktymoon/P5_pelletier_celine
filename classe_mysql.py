@@ -16,12 +16,15 @@ class MysqlConnector:
         execute('sql1;sql2;', multi=1)
         """
         cursor = self.connexion.cursor()
-        cursor.execute(req, info, **kwargs)
-        id_create = cursor.lastrowid
-        self.connexion.commit()
-        cursor.close()
-        if id_create:
-            return id_create
+        try:
+            cursor.execute(req, info, **kwargs)
+            id_create = cursor.lastrowid
+            if not kwargs:
+                self.connexion.commit()
+            if id_create:
+                return id_create
+        finally:
+            cursor.close()
 
     def select(self, req, info=()):
         cursor = self.connexion.cursor()
