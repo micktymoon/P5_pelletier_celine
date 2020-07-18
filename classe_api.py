@@ -19,11 +19,16 @@ class ApiSearch:
         final_http = self.api_search_terms + name_product
         response = requests.get(final_http)
         response_text = json.loads(response.text)
-        path = response_text["products"][0]
-        final_product = {"name": path["product_name"], "brand": path.get("brands", None),
-                         "category_id": path.get("categories", None), "nutri_score": path.get("nutriscore_grade", None),
-                         "store": path.get("stores", None), "ingredients": path.get("ingredients_text", None)}
-        return final_product
+        i = 0
+        list_product = []
+        while i < 2:
+            path = response_text["products"][i]
+            final_product = {"name": path["product_name"], "brand": path.get("brands", None),
+                             "category": path.get("categories", None), "nutri_score": path.get("nutriscore_grade", None),
+                             "store": path.get("stores", None), "ingredients": path.get("ingredients_text", None)}
+            list_product.append(final_product)
+            i += 1
+        return list_product
 
     def search_cat(self, name_cat):
         response = requests.get(self.api_search_cat)

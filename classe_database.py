@@ -23,26 +23,50 @@ class DatabaseManager:
             PRIMARY KEY (id)
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        CREATE TABLE Store (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            name_store VARCHAR(255) NOT NULL,
+            PRIMARY KEY (id)
+            )
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;
         CREATE TABLE Product (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             name_product VARCHAR(255) NOT NULL,
             brand VARCHAR(255),
-            category_id INT UNSIGNED,
+            category TEXT,
             nutri_score VARCHAR(2),
             store TEXT,
             ingredient TEXT,
             PRIMARY KEY (id)
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        CREATE TABLE ProductCategory (
+            id_cat INT UNSIGNED NOT NULL,
+            id_product_cat INT UNSIGNED NOT NULL
+            )
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;  
         CREATE TABLE Substitute (
             id_product INT UNSIGNED NOT NULL,
             id_product_substitute INT UNSIGNED NOT NULL
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        CREATE TABLE ProductStore (
+            id_product INT UNSIGNED NOT NULL,
+            id_product_store INT UNSIGNED NOT NULL
+            )
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ALTER TABLE ProductCategory ADD CONSTRAINT fk_idproduct
+        FOREIGN KEY (id_product) REFERENCES Product(id);
+        ALTER TABLE ProductCategory ADD CONSTRAINT fk_id_product_cat
+        FOREIGN KEY (id_product_cat) REFERENCES Categories(id);
         ALTER TABLE Substitute ADD CONSTRAINT fk_id_product 
         FOREIGN KEY (id_product) REFERENCES Product(id);
-        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_id_product_substitute 
-        FOREIGN KEY (id_product_substitute) REFERENCES Product(id);"""
+        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_substitute 
+        FOREIGN KEY (id_product_substitute) REFERENCES Product(id);
+        ALTER TABLE ProductStore ADD CONSTRAINT fk_idproduct
+        FOREIGN KEY (id_product) REFERENCES Product(id);
+        ALTER TABLE ProductStore ADD CONSTRAINT fk_id_product_store
+        FOREIGN KEY (id_product_store) REFERENCES Store(id);"""
         self.connector.execute(req, multi=1)
 
 
@@ -76,6 +100,36 @@ class CategoryManager:
         return self.connector.select(req, (id_cat,))
 
 
+class StoreManager:
+
+    def __init__(self, connector):
+        self.connector = connector
+
+    def delete(self, id_delete):
+        req = "DELETE FROM Store WHERE id = %s"
+        self.connector.execute(req, (id_delete,))
+
+    def insert(self, store):
+        req = "INSERT INTO Store (name_store) VALUES (%s)"
+        id_ = self.connector.execute(req, (store["name"],))
+        store['id'] = id_
+
+    def update(self, id_store_update, name_store_update):
+        infos = (name_store_update, id_store_update)
+        req = "UPDATE Store SET name_cat= %s WHERE id = %s"
+        self.connector.execute(req, infos)
+
+    def select(self):
+        req = "SELECT * FROM Store"
+        return self.connector.select(req)
+        # for x in select:
+        #     print("id {} : {}".format(x[0], x[1]))
+
+    def get(self, id_store):
+        req = "SELECT name_store FROM Store WHERE id = %s"
+        return self.connector.select(req, (id_store,))
+
+
 class ProductManager:
 
     def __init__(self, connector):
@@ -88,17 +142,17 @@ class ProductManager:
 
     def insert(self, product):
         req = "INSERT INTO Product " \
-              "(name_product, brand, category_id, nutri_score, store, ingredient) " \
+              "(name_product, brand, category, nutri_score, store, ingredient) " \
               "VALUES (%s, %s, %s, %s, %s, %s)"
         self.connector.execute(req, (product["name"],
                                      product["brand"],
-                                     product["category_id"],
+                                     product["category"],
                                      product["nutri_score"],
                                      product["store"],
-                                     product["ingredient"]))
+                                     product["ingredients"]))
 
     def update(self, product):
-        req = "UPDATE Product SET name_product=%s, brand=%s, category_id=%s, nutri_score=%s, store=%s, ingredient=%s" \
+        req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, nutri_score=%s, store=%s, ingredient=%s" \
               "WHERE id=%s"
         self.connector.execute(req, (product["name"],
                                      product["brand"],
@@ -140,3 +194,12 @@ class ProductManager:
 # print(produit)
 # produit['brand'] = 'sodebo'
 # pm.update(produit)
+
+
+class SubstituteManager:
+    """"""
+    def __init__(self, connector):
+        self.connector = connector
+
+    def add_substitute(self):
+        pass
