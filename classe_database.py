@@ -82,7 +82,7 @@ class DatabaseManager:
             id_product INT UNSIGNED NOT NULL,
             id_product_cat INT UNSIGNED NOT NULL
             )
-            ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;
         CREATE TABLE Substitute (
             id_product INT UNSIGNED NOT NULL,
             id_product_substitute INT UNSIGNED NOT NULL
@@ -97,9 +97,9 @@ class DatabaseManager:
         FOREIGN KEY (id_product) REFERENCES Product(id);
         ALTER TABLE ProductCategory ADD CONSTRAINT fk_id_product_cat
         FOREIGN KEY (id_product_cat) REFERENCES Categories(id);
-        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product 
+        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product
         FOREIGN KEY (id_product) REFERENCES Product(id);
-        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_substitute 
+        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_substitute
         FOREIGN KEY (id_product_substitute) REFERENCES Product(id);
         ALTER TABLE ProductStore ADD CONSTRAINT fk_idproduct
         FOREIGN KEY (id_product) REFERENCES Product(id);
@@ -421,8 +421,8 @@ class ProductManager:
                 The product we want to insert in the table.
         """
         req = "INSERT INTO Product " \
-              "(name_product, brand, category, nutri_score, store, ingredient) " \
-              "VALUES (%s, %s, %s, %s, %s, %s)"
+              "(name_product, brand, category, nutri_score, " \
+              "store, ingredient) VALUES (%s, %s, %s, %s, %s, %s)"
         id_ = self.connector.execute(req, (product["name"],
                                      product["brand"],
                                      product["category"],
@@ -441,7 +441,8 @@ class ProductManager:
             product: dict
                 The product we want to update in the table.
         """
-        req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, nutri_score=%s, store=%s, ingredient=%s" \
+        req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, " \
+              "nutri_score=%s, store=%s, ingredient=%s" \
               "WHERE id=%s"
         self.connector.execute(req, (product["name"],
                                      product["brand"],
@@ -495,9 +496,11 @@ class ProductManager:
 
         Returns:
              dict
-                A dictionary that represents a product with the Id and the name.
+                A dictionary that represents a product with the Id and the
+                 name.
         """
-        req = "SELECT name_product, brand, category, nutri_score, store, ingredient FROM Product " \
+        req = "SELECT name_product, brand, category, nutri_score, store, " \
+              "ingredient FROM Product " \
               "WHERE Product.id = %s"
         select = self.connector.select(req, (id_product,))
         product = {"id": id_product,
@@ -569,8 +572,10 @@ class ProductCategoryManager:
         """
         req = "SELECT Product.name_product, Categories.name_cat  " \
               "FROM Product " \
-              "INNER JOIN ProductCategory ON ProductCategory.id_product = Product.id " \
-              "INNER JOIN Categories ON Categories.id = ProductCategory.id_product_cat  " \
+              "INNER JOIN ProductCategory " \
+              "ON ProductCategory.id_product = Product.id " \
+              "INNER JOIN Categories " \
+              "ON Categories.id = ProductCategory.id_product_cat  " \
               "WHERE Product.id = %s"
         response = self.connector.select(req, (id_product,))
         return response
@@ -635,8 +640,10 @@ class ProductStoreManager:
         """
         req = "SELECT Product.name_product, Store.name_store  " \
               "FROM Product " \
-              "INNER JOIN ProductStore ON ProductStore.id_product = Product.id " \
-              "INNER JOIN Store ON Store.id = ProductStore.id_product_store  " \
+              "INNER JOIN ProductStore " \
+              "ON ProductStore.id_product = Product.id " \
+              "INNER JOIN Store " \
+              "ON Store.id = ProductStore.id_product_store  " \
               "WHERE Product.id = %s"
         response = self.connector.select(req, (id_product,))
         return response
