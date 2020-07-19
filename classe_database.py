@@ -3,19 +3,57 @@
 
 
 class DatabaseManager:
-    """ """
+    """
+    Class which manages the database.
+
+    Attributes:
+        connector : Class MysqlConnector
+            The database connector.
+
+    Methods:
+
+        create_db()
+            Create the database "purBeurre".
+
+        erase_db()
+            Delete the database "purBeurre".
+
+        create_table()
+            Create the table that compose our database.
+    """
+
     def __init__(self, connector):
+        """
+        DatebaseManager class constructor.
+
+        Parameters:
+            connector : Class MysqlConnector
+                The database connector.
+        """
         self.connector = connector
 
     def create_db(self):
+        """Create the database "purBeurre".
+
+        Execute the SQL request which allows to create the database.
+        """
         req = "CREATE DATABASE purBeurre"
         self.connector.execute(req)
 
     def erase_db(self):
+        """Delete the database "purBeurre".
+
+        Execute the SQL request which allows you to delete the database.
+        """
         req = "DROP DATABASE purBeurre"
         self.connector.execute(req)
 
     def create_table(self):
+        """Create the table that compose our database.
+
+        Execute the SQL requests which will create all the tables that the
+         database needs.
+        """
         req = """
         CREATE TABLE Categories (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -71,25 +109,99 @@ class DatabaseManager:
 
 
 class CategoryManager:
+    """
+    Class which manages the Categories table of the database.
+
+    Attributes:
+        connector : Class MysqlConnector
+            The database connector.
+
+    Methods:
+
+        delete(id_delete)
+            Delete a category from the table.
+
+        insert(category)
+            Insert a category into the table.
+
+        update(category)
+            Updates a category of the table.
+
+        select()
+            Get all the categories of the table in a list and
+             return this list.
+
+        get()
+            Get a category from the table and returns it.
+    """
 
     def __init__(self, connector):
+        """
+        CategoryManager class constructor.
+
+        Parameters:
+            connector : Class MysqlConnector
+                The database connector.
+        """
         self.connector = connector
 
     def delete(self, id_delete):
+        """
+        Delete a category from the table.
+
+        Execute the SQL request which allows you to delete a category
+         from the table.
+
+        Parameters:
+            id_delete: int
+                The ID number of the category we want to delete
+                 from the table.
+        """
         req = "DELETE FROM Categories WHERE id = %s"
         self.connector.execute(req, (id_delete,))
 
     def insert(self, category):
+        """
+        Insert a category into the table.
+
+        Execute the SQL request which allows to insert a category
+         in the table.
+
+        Parameters:
+            category: dict
+                The category we want to insert in the table.
+        """
         req = "INSERT INTO Categories (name_cat) VALUES (%s)"
         id_ = self.connector.execute(req, (category["name"],))
         category["id"] = id_
 
-    def update(self, id_cat_update, name_cat_update):
-        infos = (name_cat_update, id_cat_update)
+    def update(self, category):
+        """
+        Updates a category of the table.
+
+        Execute the SQL request which allows updating a category in the table.
+
+        Parameters:
+            category: dict
+                The category we want to update in the table.
+        """
+        infos = (category["name"], category["id"])
         req = "UPDATE Categories SET name_cat= %s WHERE id = %s"
         self.connector.execute(req, infos)
 
     def select(self):
+        """
+        Get all the categories of the table in a list and
+         return this list.
+
+        Execute the SQL request which retrieves all the categories from
+         the table, transforms each category into a dictionary comprising
+         the ID and the name, and returns a list of all these categories.
+
+        Returns:
+            list
+                A list of all the categories of the table.
+        """
         req = "SELECT * FROM Categories"
         response = self.connector.select(req)
         list_cat = []
@@ -99,6 +211,22 @@ class CategoryManager:
         return list_cat
 
     def get(self, id_cat):
+        """
+        Get a category from the table and returns it.
+
+        Execute the SQL query which retrieves the desired category,
+         transforms it into a dictionary comprising an ID and a name,
+         and returns this category.
+
+        Parameters:
+            id_cat : int
+                The ID number of the category we want to get from the table.
+
+        Returns:
+             dict
+                A dictionary that represents a category with the Id
+                 and the name.
+        """
         req = "SELECT name_cat FROM Categories WHERE id = %s"
         response = self.connector.select(req, (id_cat,))
         category = {"id": id_cat, "name": response[0][0]}
@@ -106,25 +234,99 @@ class CategoryManager:
 
 
 class StoreManager:
+    """
+    Class which manages the Store table of the database.
+
+    Attributes:
+       connector : Class MysqlConnector
+           The database connector.
+
+    Methods:
+
+       delete(id_delete)
+           Delete a store from the table.
+
+       insert(store)
+           Insert a store into the table.
+
+       update(store)
+           Updates a store of the table.
+
+       select()
+           Get all the stores of the table in a list and
+            return this list.
+
+       get()
+           Get a store from the table and returns it.
+    """
 
     def __init__(self, connector):
+        """
+        StoreManager class constructor.
+
+        Parameters:
+            connector : Class MysqlConnector
+                The database connector.
+        """
         self.connector = connector
 
     def delete(self, id_delete):
+        """
+        Delete a store from the table.
+
+        Execute the SQL request which allows you to delete a store
+         from the table.
+
+        Parameters:
+            id_delete: int
+                The ID number of the store we want to delete
+                 from the table.
+        """
         req = "DELETE FROM Store WHERE id = %s"
         self.connector.execute(req, (id_delete,))
 
     def insert(self, store):
+        """
+        Insert a store into the table.
+
+        Execute the SQL request which allows to insert a store
+         in the table.
+
+        Parameters:
+            store: dict
+                The store we want to insert in the table.
+        """
         req = "INSERT INTO Store (name_store) VALUES (%s)"
         id_ = self.connector.execute(req, (store["name"],))
         store['id'] = id_
 
-    def update(self, id_store_update, name_store_update):
-        infos = (name_store_update, id_store_update)
+    def update(self, store):
+        """
+        Updates a store of the table.
+
+        Execute the SQL request which allows updating a store in the table.
+
+        Parameters:
+            store: dict
+                The store we want to update in the table.
+        """
+        infos = (store["name"], store["id"])
         req = "UPDATE Store SET name_cat= %s WHERE id = %s"
         self.connector.execute(req, infos)
 
     def select(self):
+        """
+        Get all the stores of the table in a list and
+         return this list.
+
+        Execute the SQL request which retrieves all the stores from
+         the table, transforms each store into a dictionary comprising
+         the ID and the name, and returns a list of all these stores.
+
+        Returns:
+            list
+                A list of all the stores of the table.
+        """
         req = "SELECT * FROM Store"
         response = self.connector.select(req)
         list_store = []
@@ -134,6 +336,21 @@ class StoreManager:
         return list_store
 
     def get(self, id_store):
+        """
+        Get a store from the table and returns it.
+
+        Execute the SQL query which retrieves the desired store,
+         transforms it into a dictionary comprising the ID and the name,
+         and returns this store.
+
+        Parameters:
+            id_store : int
+                The ID number of the store we want to get from the table.
+
+        Returns:
+             dict
+                A dictionary that represents a store with the Id and the name.
+        """
         req = "SELECT name_store FROM Store WHERE id = %s"
         response = self.connector.select(req, (id_store,))
         store = {"id": id_store, "name": response[0][0]}
@@ -141,20 +358,72 @@ class StoreManager:
 
 
 class ProductManager:
+    """
+    Class which manages the Product table of the database.
+
+    Attributes:
+       connector : Class MysqlConnector
+           The database connector.
+
+    Methods:
+
+       delete(id_delete)
+           Delete a product from the table.
+
+       insert(product)
+           Insert a product into the table.
+
+       update(product)
+           Updates a product of the table.
+
+       select()
+           Get all the products of the table in a list and
+            return this list.
+
+       get()
+           Get a product from the table and returns it.
+    """
 
     def __init__(self, connector):
+        """
+        ProductManager class constructor.
 
+        Parameters:
+           connector : Class MysqlConnector
+               The database connector.
+        """
         self.connector = connector
 
     def delete(self, id_delete):
+        """
+        Delete a product from the table.
+
+        Execute the SQL request which allows you to delete a product
+         from the table.
+
+        Parameters:
+            id_delete: int
+                The ID number of the product we want to delete
+                 from the table.
+        """
         req = "DELETE FROM Product WHERE id = %s"
         self.connector.execute(req, (id_delete,))
 
     def insert(self, product):
+        """
+        Insert a product into the table.
+
+        Execute the SQL request which allows to insert a product
+         in the table.
+
+        Parameters:
+            product: dict
+                The product we want to insert in the table.
+        """
         req = "INSERT INTO Product " \
               "(name_product, brand, category, nutri_score, store, ingredient) " \
               "VALUES (%s, %s, %s, %s, %s, %s)"
-        id_= self.connector.execute(req, (product["name"],
+        id_ = self.connector.execute(req, (product["name"],
                                      product["brand"],
                                      product["category"],
                                      product["nutri_score"],
@@ -163,6 +432,15 @@ class ProductManager:
         product["id"] = id_
 
     def update(self, product):
+        """
+        Updates a product of the table.
+
+        Execute the SQL request which allows updating a product in the table.
+
+        Parameters:
+            product: dict
+                The product we want to update in the table.
+        """
         req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, nutri_score=%s, store=%s, ingredient=%s" \
               "WHERE id=%s"
         self.connector.execute(req, (product["name"],
@@ -174,6 +452,20 @@ class ProductManager:
                                      product["id"]))
 
     def select(self):
+        """
+        Get all the products of the table in a list and
+        return this list.
+
+        Execute the SQL request which retrieves all the products from
+         the table, transforms each product into a dictionary comprising
+         the ID, the name, the brand, the categories, the nutri-score,
+         the stores and the ingredients.
+         And returns a list of all these products.
+
+        Returns:
+            list
+                A list of all the products of the table.
+       """
         req = "SELECT * FROM Product"
         select = self.connector.select(req)
         list_product = []
@@ -189,6 +481,22 @@ class ProductManager:
         return list_product
 
     def get(self, id_product):
+        """
+        Get a product from the table and returns it.
+
+        Execute the SQL query which retrieves the desired product,
+         transforms it into a dictionary comprising the ID, the name,
+         the brand, the categories, the nutri-score, the stores and the
+         ingredients. And returns this product.
+
+        Parameters:
+            id_product : int
+                The ID number of the product we want to get from the table.
+
+        Returns:
+             dict
+                A dictionary that represents a product with the Id and the name.
+        """
         req = "SELECT name_product, brand, category, nutri_score, store, ingredient FROM Product " \
               "WHERE Product.id = %s"
         select = self.connector.select(req, (id_product,))
@@ -203,16 +511,62 @@ class ProductManager:
 
 
 class ProductCategoryManager:
-    """"""
+    """
+    Class which manages the ProductCategory table of the database.
+
+    Attributes:
+       connector : Class MysqlConnector
+           The database connector.
+
+    Methods:
+
+        insert_association(id_cat, id_product)
+            Insert the association of a product with a category.
+
+        select_association(id_product)
+            Get the association of a product with a category.
+    """
     def __init__(self, connector):
+        """
+        ProductCategoryManager class constructor.
+
+        Parameters:
+          connector : Class MysqlConnector
+              The database connector.
+        """
         self.connector = connector
 
-    def insert_product_category(self, id_cat, id_product):
+    def insert_association(self, id_cat, id_product):
+        """
+        Insert an association of a product with a category into the table.
+
+        Execute the SQL request which allows to insert an association of
+         a product with a category in the table.
+
+        Parameters:
+            id_cat : int
+                The ID number of the category we want to insert into
+                 the table.
+
+            id_product : int
+                The ID number of the product we want to insert into
+                 the table.
+        """
         req = "INSERT INTO ProductCategory (id_product, id_product_cat)" \
               "VALUES (%s, %s)"
         self.connector.execute(req, (id_product, id_cat))
 
-    def select_product_category(self, id_product):
+    def select_association(self, id_product):
+        """
+        Get the associations of a product with its categories and return them.
+
+        Execute the SQL request which retrieves the associations of a product
+         with its categories. And returns a list of its associations.
+
+        Returns:
+            list
+                A list of the associations of a product with its categories.
+        """
         req = "SELECT Product.name_product, Categories.name_cat  " \
               "FROM Product " \
               "INNER JOIN ProductCategory ON ProductCategory.id_product = Product.id " \
@@ -223,16 +577,62 @@ class ProductCategoryManager:
 
 
 class ProductStoreManager:
-    """"""
+    """
+    Class which manages the ProductStore table of the database.
+
+    Attributes:
+       connector : Class MysqlConnector
+           The database connector.
+
+    Methods:
+
+        insert_association(id_cat, id_product)
+            Insert the association of a product with a category.
+
+        select_association(id_product)
+            Get the association of a product with a category.
+    """
     def __init__(self, connector):
+        """
+        ProductStoreManager class constructor.
+
+        Parameters:
+          connector : Class MysqlConnector
+              The database connector.
+        """
         self.connector = connector
 
-    def insert_product_store(self, id_store, id_product):
+    def insert_association(self, id_store, id_product):
+        """
+        Insert an association of a product with a store into the table.
+
+        Execute the SQL request which allows to insert an association of
+         a product with a store in the table.
+
+        Parameters:
+            id_store : int
+                The ID number of the store we want to insert into
+                 the table.
+
+            id_product : int
+                The ID number of the product we want to insert into
+                 the table.
+        """
         req = "INSERT INTO ProductStore (id_product, id_product_store)" \
               "VALUES (%s, %s)"
         self.connector.execute(req, (id_product, id_store))
 
-    def select_product_store(self, id_product):
+    def select_association(self, id_product):
+        """
+        Get the associations of a product with its stores and return them.
+
+        Execute the SQL request which retrieves the associations of a product
+         with its stores. And returns a list of its associations.
+
+        Returns:
+            list
+                A list of the associations of a product with its stores.
+        """
         req = "SELECT Product.name_product, Store.name_store  " \
               "FROM Product " \
               "INNER JOIN ProductStore ON ProductStore.id_product = Product.id " \

@@ -70,4 +70,4 @@ for pdt in product:
             pass
 
 print("les produit ont été ajouté et associé à leurs catégories")
-print(pcm.select_product_category(11))
+print(pcm.select_association(11))

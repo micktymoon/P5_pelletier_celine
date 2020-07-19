@@ -52,7 +52,7 @@ def associate_cat_to_product(cm, pcm, product):
     for cat in list_cat_db:
         for cat_prod in product_cat_strip:
             if cat_prod == cat["name"]:
-                pcm.insert_product_category(cat["id"], product["id"])
+                pcm.insert_association(cat["id"], product["id"])
                 return True
 
 
@@ -81,5 +81,5 @@ def associate_store_to_product(sm, psm, product):
     for store in list_store_db:
         for prod_store in product_store_strip:
             if prod_store == store["name"]:
-                psm.insert_product_store(store["id"], product["id"])
+                psm.insert_association(store["id"], product["id"])
                 return True
