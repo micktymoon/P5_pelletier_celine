@@ -23,9 +23,12 @@ class ApiSearch:
         list_product = []
         while i < 2:
             path = response_text["products"][i]
-            final_product = {"name": path["product_name"], "brand": path.get("brands", None),
-                             "category": path.get("categories", None), "nutri_score": path.get("nutriscore_grade", None),
-                             "store": path.get("stores", None), "ingredients": path.get("ingredients_text", None)}
+            final_product = {"name": path["product_name"],
+                             "brand": path.get("brands", None),
+                             "category": path.get("categories", None),
+                             "nutri_score": path.get("nutriscore_grade", None),
+                             "store": path.get("stores", None),
+                             "ingredients": path.get("ingredients_text", None)}
             list_product.append(final_product)
             i += 1
         return list_product

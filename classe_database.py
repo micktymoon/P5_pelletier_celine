@@ -82,7 +82,7 @@ class CategoryManager:
     def insert(self, category):
         req = "INSERT INTO Categories (name_cat) VALUES (%s)"
         id_ = self.connector.execute(req, (category["name"],))
-        category['id'] = id_
+        category["id"] = id_
 
     def update(self, id_cat_update, name_cat_update):
         infos = (name_cat_update, id_cat_update)
@@ -91,13 +91,18 @@ class CategoryManager:
 
     def select(self):
         req = "SELECT * FROM Categories"
-        return self.connector.select(req)
-        # for x in select:
-        #     print("id {} : {}".format(x[0], x[1]))
+        response = self.connector.select(req)
+        list_cat = []
+        for cat in response:
+            category = {"id": cat[0], "name": cat[1]}
+            list_cat.append(category)
+        return list_cat
 
     def get(self, id_cat):
         req = "SELECT name_cat FROM Categories WHERE id = %s"
-        return self.connector.select(req, (id_cat,))
+        response = self.connector.select(req, (id_cat,))
+        category = {"id": id_cat, "name": response[0][0]}
+        return category
 
 
 class StoreManager:
@@ -144,19 +149,20 @@ class ProductManager:
         req = "INSERT INTO Product " \
               "(name_product, brand, category, nutri_score, store, ingredient) " \
               "VALUES (%s, %s, %s, %s, %s, %s)"
-        self.connector.execute(req, (product["name"],
+        id_= self.connector.execute(req, (product["name"],
                                      product["brand"],
                                      product["category"],
                                      product["nutri_score"],
                                      product["store"],
                                      product["ingredients"]))
+        product["id"] = id_
 
     def update(self, product):
         req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, nutri_score=%s, store=%s, ingredient=%s" \
               "WHERE id=%s"
         self.connector.execute(req, (product["name"],
                                      product["brand"],
-                                     product["category_id"],
+                                     product["category"],
                                      product["nutri_score"],
                                      product["store"],
                                      product["ingredient"],
@@ -165,41 +171,40 @@ class ProductManager:
     def select(self):
         req = "SELECT * FROM Product"
         select = self.connector.select(req)
-        return select
-        # for product in select:
-        #     print("id : {} "
-        #           "name : {} "
-        #           "brand : {} "
-        #           "category_id : {} "
-        #           "nutriscore : {} "
-        #           "store : {} "
-        #           "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5], product[6]))
+        list_product = []
+        for product in select:
+            product_return = {"id": product[0],
+                              "name": product[1],
+                              "brand": product[2],
+                              "category": product[3],
+                              "nutriscore": product[4],
+                              "store": product[5],
+                              "ingredient": product[6]}
+            list_product.append(product_return)
+        return list_product
 
     def get(self, id_product):
-        req = "SELECT name_product, brand, Categories.name_cat, nutri_score, store, ingredient FROM Product " \
-              "INNER JOIN Categories ON Categories.id = Product.category_id " \
+        req = "SELECT name_product, brand, category, nutri_score, store, ingredient FROM Product " \
               "WHERE Product.id = %s"
         select = self.connector.select(req, (id_product,))
-        return select
-        # for product in select:
-        #     print("name : {} \n"
-        #           "brand : {} \n"
-        #           "category : {} \n"
-        #           "nutriscore : {} \n"
-        #           "store : {} \n"
-        #           "ingredients : {}".format(product[0], product[1], product[2], product[3], product[4], product[5]))
-
-# pm = ProductManager()
-# produit = pm.get('17')
-# print(produit)
-# produit['brand'] = 'sodebo'
-# pm.update(produit)
+        product = {"id": id_product,
+                   "name": select[0][0],
+                   "brand": select[0][1],
+                   "category": select[0][2],
+                   "nutriscore": select[0][3],
+                   "store": select[0][4],
+                   "ingredient": select[0][5]}
+        return product
 
 
-class SubstituteManager:
+class ProductCategoryManager:
     """"""
     def __init__(self, connector):
         self.connector = connector
 
-    def add_substitute(self):
-        pass
+    def insert_product_category(self, id_cat, id_product):
+        req = "INSERT INTO ProductCategory (id_cat, id_product_cat)" \
+              "VALUES (%s, %s)"
+        self.connector.execute(req, (id_cat, id_product))
+
+

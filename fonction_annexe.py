@@ -50,3 +50,43 @@ def get_store_and_add_to_db(sm, text):
         store = {"name": word}
         if store["name"] not in list_store_db:
             sm.insert(store)
+
+
+def associate_cat_to_product(cm, pcm, product):
+    """Add a category to a product in the database
+
+    Get the product categories and the categories of the database.
+    Checks if one of the product categories corresponds to one of the
+     categories of the database, and if yes, associates the product with
+     the category.
+
+    Parameters:
+        cm : class CategoryManager
+            The manager of the Categories table in the database.
+        pcm : class ProductCategoryManager
+            The manager of the ProductCategory table in the database.
+        product : dict
+            The product to whiwh we want to associate a category.
+     """
+    product_cat = product["category"].split(",")
+    product_cat_strip = []
+    for cat in product_cat:
+        cat = cat.strip()
+        product_cat_strip.append(cat)
+    list_cat_db = cm.select()
+    for cat in list_cat_db:
+        for cat_prod in product_cat_strip:
+            if cat_prod == cat["name"]:
+                pcm.insert_product_category(cat["id"], product["id"])
+                return True
+
+#
+# prod = {"id": 2, ...}
+# if associate_cat_to_product(cm, pcm, prod) != True:
+#     product_cat = prod["category"].split(",")
+#     product_cat_strip = []
+#     for cat in product_cat:
+#         cat = cat.strip()
+#         product_cat_strip.append(cat)
+#     category = {"name": product_cat_strip[0]}
+#     cm.insert(category)
