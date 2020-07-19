@@ -41,7 +41,7 @@ class DatabaseManager:
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
         CREATE TABLE ProductCategory (
-            id_cat INT UNSIGNED NOT NULL,
+            id_product INT UNSIGNED NOT NULL,
             id_product_cat INT UNSIGNED NOT NULL
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;  
@@ -126,13 +126,18 @@ class StoreManager:
 
     def select(self):
         req = "SELECT * FROM Store"
-        return self.connector.select(req)
-        # for x in select:
-        #     print("id {} : {}".format(x[0], x[1]))
+        response = self.connector.select(req)
+        list_store = []
+        for store in response:
+            sto = {"id": store[0], "name": store[1]}
+            list_store.append(sto)
+        return list_store
 
     def get(self, id_store):
         req = "SELECT name_store FROM Store WHERE id = %s"
-        return self.connector.select(req, (id_store,))
+        response = self.connector.select(req, (id_store,))
+        store = {"id": id_store, "name": response[0][0]}
+        return store
 
 
 class ProductManager:
@@ -203,8 +208,35 @@ class ProductCategoryManager:
         self.connector = connector
 
     def insert_product_category(self, id_cat, id_product):
-        req = "INSERT INTO ProductCategory (id_cat, id_product_cat)" \
+        req = "INSERT INTO ProductCategory (id_product, id_product_cat)" \
               "VALUES (%s, %s)"
-        self.connector.execute(req, (id_cat, id_product))
+        self.connector.execute(req, (id_product, id_cat))
+
+    def select_product_category(self, id_product):
+        req = "SELECT Product.name_product, Categories.name_cat  " \
+              "FROM Product " \
+              "INNER JOIN ProductCategory ON ProductCategory.id_product = Product.id " \
+              "INNER JOIN Categories ON Categories.id = ProductCategory.id_product_cat  " \
+              "WHERE Product.id = %s"
+        response = self.connector.select(req, (id_product,))
+        return response
 
 
+class ProductStoreManager:
+    """"""
+    def __init__(self, connector):
+        self.connector = connector
+
+    def insert_product_store(self, id_store, id_product):
+        req = "INSERT INTO ProductStore (id_product, id_product_store)" \
+              "VALUES (%s, %s)"
+        self.connector.execute(req, (id_product, id_store))
+
+    def select_product_store(self, id_product):
+        req = "SELECT Product.name_product, Store.name_store  " \
+              "FROM Product " \
+              "INNER JOIN ProductStore ON ProductStore.id_product = Product.id " \
+              "INNER JOIN Store ON Store.id = ProductStore.id_product_store  " \
+              "WHERE Product.id = %s"
+        response = self.connector.select(req, (id_product,))
+        return response
