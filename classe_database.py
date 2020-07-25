@@ -473,7 +473,7 @@ class ProductManager:
                                      product["ingredient"],
                                      product["id"]))
 
-    def select(self):
+    def select(self, name=None):
         """
         Get all the products of the table in a list and
         return this list.
@@ -488,19 +488,35 @@ class ProductManager:
             list
                 A list of all the products of the table.
        """
-        req = "SELECT * FROM Product"
-        select = self.connector.select(req)
-        list_product = []
-        for product in select:
-            product_return = {"id": product[0],
-                              "name": product[1],
-                              "brand": product[2],
-                              "category": product[3],
-                              "nutriscore": product[4],
-                              "store": product[5],
-                              "ingredient": product[6]}
-            list_product.append(product_return)
-        return list_product
+        if name is None:
+            req = "SELECT * FROM Product"
+            select = self.connector.select(req)
+            list_product = []
+            for product in select:
+                product_return = {"id": product[0],
+                                  "name": product[1],
+                                  "brand": product[2],
+                                  "category": product[3],
+                                  "nutriscore": product[4],
+                                  "store": product[5],
+                                  "ingredient": product[6]}
+                list_product.append(product_return)
+            return list_product
+        if name is not None:
+            try:
+                req = "SELECT id, name_product FROM Product " \
+                      "WHERE name_product=%s;"
+                response = self.connector.select(req, (name,))
+                product = {"id": response[0][0],
+                           "name": response[0][1],
+                           "brand": response[0][2],
+                           "category": response[0][3],
+                           "nutriscore": response[0][4],
+                           "store": response[0][5],
+                           "ingredient": response[0][6]}
+                return product
+            except IndexError:
+                return None
 
     def get(self, id_product):
         """
@@ -591,7 +607,7 @@ class ProductCategoryManager:
             list
                 A list of the associations of a product with its categories.
         """
-        req = "SELECT Product.name_product, Categories.name_cat  " \
+        req = "SELECT Categories.name_cat  " \
               "FROM Product " \
               "INNER JOIN ProductCategory " \
               "ON ProductCategory.id_product = Product.id " \
@@ -599,7 +615,10 @@ class ProductCategoryManager:
               "ON Categories.id = ProductCategory.id_product_cat  " \
               "WHERE Product.id = %s"
         response = self.connector.select(req, (id_product,))
-        return response
+        list_cat = []
+        for cat in response:
+            list_cat.append(cat[0])
+        return list_cat
 
 
 class ProductStoreManager:
@@ -659,7 +678,7 @@ class ProductStoreManager:
             list
                 A list of the associations of a product with its stores.
         """
-        req = "SELECT Product.name_product, Store.name_store  " \
+        req = "SELECT Store.name_store  " \
               "FROM Product " \
               "INNER JOIN ProductStore " \
               "ON ProductStore.id_product = Product.id " \
@@ -667,8 +686,79 @@ class ProductStoreManager:
               "ON Store.id = ProductStore.id_product_store  " \
               "WHERE Product.id = %s"
         response = self.connector.select(req, (id_product,))
-        return response
+        list_store = []
+        for store in response:
+            list_store.append(store[0])
+        return list_store
 
 
-class SubstitueManage:
-    """"""
+class SubstituteManager:
+    """
+        Class which manages the Substitute table of the database.
+
+        Attributes:
+           connector : Class MysqlConnector
+               The database connector.
+
+        Methods:
+
+            insert_association(id_sub, id_product)
+                Insert the association of a product with a substitute.
+
+            select_association(id_product)
+                Get the association of a product with a substitute.
+        """
+
+    def __init__(self, connector):
+        """
+        SubstituteManager class constructor.
+
+        Parameters:
+          connector : Class MysqlConnector
+              The database connector.
+        """
+        self.connector = connector
+
+    def insert_association(self, id_product, id_sub):
+        """
+        Insert an association of a product with a substitute into the table.
+
+        Execute the SQL request which allows to insert an association of
+         a product with a substitute in the table.
+
+        Parameters:
+            id_product : int
+                The ID number of the product we want to insert into
+                 the table.
+
+            id_sub : int
+                The ID number of the substitute we want to insert into
+                 the table.
+        """
+        req = "INSERT INTO Substitute (id_product, id_product_substitute)" \
+              "VALUES (%s, %s)"
+        self.connector.execute(req, (id_product, id_sub))
+
+    def select_association(self, id_product, psm, pcm, pm):
+        """
+        Get the associations of a product with its substitute and return them.
+
+        Execute the SQL request which retrieves the associations of a product
+         with its substitutes. And returns a list of its associations.
+
+        Returns:
+            list
+                A list of the associations of a product with its substitutes.
+        """
+        req = "SELECT Product.id, Product.name_product  " \
+              "FROM Product " \
+              "INNER JOIN Substitute " \
+              "ON Product.id = Substitute.id_product_substitute " \
+              "WHERE Substitute.id_product=%s"
+        response = self.connector.select(req, (id_product,))
+        substitute = {"id": response[0][0], "name": response[0][1]}
+        substitute["store"] = psm.select_association(substitute["id"])
+        substitute["category"] = pcm.select_association(substitute["id"])
+        product = pm.get(substitute["id"])
+        substitute["nutriscore"] = product["nutriscore"]
+        return substitute
