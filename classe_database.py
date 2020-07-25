@@ -4,7 +4,7 @@
 
 class DatabaseManager:
     """
-    Class which manages the database.
+        Class which manages the database.
 
     Attributes:
         connector : Class MysqlConnector
@@ -189,7 +189,7 @@ class CategoryManager:
         req = "UPDATE Categories SET name_cat= %s WHERE id = %s"
         self.connector.execute(req, infos)
 
-    def select(self):
+    def select(self, name=None):
         """
         Get all the categories of the table in a list and
          return this list.
@@ -202,13 +202,23 @@ class CategoryManager:
             list
                 A list of all the categories of the table.
         """
-        req = "SELECT * FROM Categories"
-        response = self.connector.select(req)
-        list_cat = []
-        for cat in response:
-            category = {"id": cat[0], "name": cat[1]}
-            list_cat.append(category)
-        return list_cat
+        if name is None:
+            req = "SELECT * FROM Categories"
+            response = self.connector.select(req)
+            list_cat = []
+            for cat in response:
+                category = {"id": cat[0], "name": cat[1]}
+                list_cat.append(category)
+            return list_cat
+        if name is not None:
+            try:
+                req = "SELECT id, name_cat FROM Categories " \
+                      "WHERE name_cat=%s;"
+                response = self.connector.select(req, (name,))
+                category = {"id": response[0][0], "name": response[0][1]}
+                return category
+            except IndexError:
+                return None
 
     def get(self, id_cat):
         """
@@ -314,7 +324,7 @@ class StoreManager:
         req = "UPDATE Store SET name_cat= %s WHERE id = %s"
         self.connector.execute(req, infos)
 
-    def select(self):
+    def select(self, name=None):
         """
         Get all the stores of the table in a list and
          return this list.
@@ -327,13 +337,24 @@ class StoreManager:
             list
                 A list of all the stores of the table.
         """
-        req = "SELECT * FROM Store"
-        response = self.connector.select(req)
-        list_store = []
-        for store in response:
-            sto = {"id": store[0], "name": store[1]}
-            list_store.append(sto)
-        return list_store
+        if name is None:
+            req = "SELECT * FROM Store"
+            response = self.connector.select(req)
+            list_store = []
+            for store in response:
+                sto = {"id": store[0], "name": store[1]}
+                list_store.append(sto)
+            return list_store
+
+        if name is not None:
+            try:
+                req = "SELECT id, name_store FROM Store " \
+                      "WHERE name_store=%s;"
+                response = self.connector.select(req, (name,))
+                store = {"id": response[0][0], "name": response[0][1]}
+                return store
+            except IndexError:
+                return None
 
     def get(self, id_store):
         """
@@ -647,3 +668,7 @@ class ProductStoreManager:
               "WHERE Product.id = %s"
         response = self.connector.select(req, (id_product,))
         return response
+
+
+class SubstitueManage:
+    """"""

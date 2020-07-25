@@ -2,6 +2,25 @@
 # -*-coding: utf8 -*-
 
 
+def get_word_remove_spaces(text):
+    """
+
+       Parameters
+       ----------
+       text
+
+       Returns
+       -------
+
+       """
+    list_words = text.split(",")
+    list_without_spaces = []
+    for word in list_words:
+        word = word.strip()
+        list_without_spaces.append(word)
+    return list_without_spaces
+
+
 def get_store_and_add_to_db(sm, text):
     """Retrieves the stores of a text and adds them to the database.
 
@@ -43,17 +62,15 @@ def associate_cat_to_product(cm, pcm, product):
         product : dict
             The product to whiwh we want to associate a category.
      """
-    product_cat = product["category"].split(",")
-    product_cat_strip = []
+    product_cat = get_word_remove_spaces(product["category"])
     for cat in product_cat:
-        cat = cat.strip()
-        product_cat_strip.append(cat)
-    list_cat_db = cm.select()
-    for cat in list_cat_db:
-        for cat_prod in product_cat_strip:
-            if cat_prod == cat["name"]:
-                pcm.insert_association(cat["id"], product["id"])
-                return True
+        check = cm.select(name=cat)
+        if check is None:
+            category = {"name": cat}
+            cm.insert(category)
+            pcm.insert_association(category["id"], product["id"])
+        else:
+            pcm.insert_association(check["id"], product["id"])
 
 
 def associate_store_to_product(sm, psm, product):
@@ -72,14 +89,12 @@ def associate_store_to_product(sm, psm, product):
             product : dict
                 The product to whiwh we want to associate a store.
          """
-    product_store = product["store"].split(",")
-    product_store_strip = []
+    product_store = get_word_remove_spaces(product["store"])
     for sto in product_store:
-        sto = sto.strip()
-        product_store_strip.append(sto)
-    list_store_db = sm.select()
-    for store in list_store_db:
-        for prod_store in product_store_strip:
-            if prod_store == store["name"]:
-                psm.insert_association(store["id"], product["id"])
-                return True
+        check = sm.select(name=sto)
+        if check is None:
+            store = {"name": sto}
+            sm.insert(store)
+            psm.insert_association(store["id"], product["id"])
+        else:
+            psm.insert_association(check["id"], product["id"])
