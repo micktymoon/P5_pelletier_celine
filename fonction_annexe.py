@@ -107,15 +107,18 @@ def associate_store_to_product(sm, psm, product):
 def associate_substitute_to_product(pm, pcm, subm, product):
     """
 
-    Parameters
-    ----------
-    pm
-    pcm
-    subm
-    product
+    Parameters:
+        pm : class ProductManager
+            The manager of the Product table in the database.
+        pcm : class ProductCategoryManager
+            The manager of the ProductCategory table in the database.
+        subm : class SubstituteManager
+            The manager of the Substitute table in the database.
+        product : dict
+            The product to whiwh we want to associate a store.
 
-    Returns
-    -------
+    Returns:
+
 
     """
     list_product_bdd = pm.select()
@@ -125,13 +128,37 @@ def associate_substitute_to_product(pm, pcm, subm, product):
         prod["category"] = pcm.select_association(prod["id"])
         for cat in prod["category"]:
             if cat in list_cat_product:
-                list_substitute_possible.append(prod)
-    for sub in list_substitute_possible:
-        if sub["nutriscore"] < product["nutriscore"]:
-            subm.insert(product["id"], sub["id"])
+                if prod["nutriscore"] < product["nutriscore"]:
+                    list_substitute_possible.append(prod)
     if list_substitute_possible:
+        for sub in list_substitute_possible:
+            subm.insert_association(product["id"], sub["id"])
         return True
     if not list_substitute_possible:
         return False
 
 
+def input_int(text):
+    """
+    Asks the user to enter a number.
+
+    Asks the user to enter a number and verifies that what they entered
+     is a number.
+     Returns the result if it is a number.
+     Displays an error message if the result is not a number.
+
+    Parameters:
+    text : str
+        The data that the user enters into the program.
+
+    Returns:
+        int
+            Number that the user has entered into the program.
+    """
+    while 1:
+        chiffre = input(text)
+        try:
+            chiffre = int(chiffre)
+            return chiffre
+        except ValueError:
+            print("ce n'est pas un entier.")

@@ -756,6 +756,7 @@ class SubstituteManager:
               "ON Product.id = Substitute.id_product_substitute " \
               "WHERE Substitute.id_product=%s"
         response = self.connector.select(req, (id_product,))
+        print(response)
         substitute = {"id": response[0][0], "name": response[0][1]}
         substitute["store"] = psm.select_association(substitute["id"])
         substitute["category"] = pcm.select_association(substitute["id"])
