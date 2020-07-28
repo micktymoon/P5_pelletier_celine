@@ -75,6 +75,7 @@ class DatabaseManager:
             nutri_score VARCHAR(2),
             store TEXT,
             ingredient TEXT,
+            url TEXT,
             PRIMARY KEY (id)
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -441,16 +442,24 @@ class ProductManager:
             product: dict
                 The product we want to insert in the table.
         """
-        req = "INSERT INTO Product " \
-              "(name_product, brand, category, nutri_score, " \
-              "store, ingredient) VALUES (%s, %s, %s, %s, %s, %s)"
-        id_ = self.connector.execute(req, (product["name"],
-                                     product["brand"],
-                                     product["category"],
-                                     product["nutri_score"],
-                                     product["store"],
-                                     product["ingredients"]))
-        product["id"] = id_
+        check = self.select(name=product["name"])
+        if check is None:
+            req = "INSERT INTO Product " \
+                  "(name_product, brand, category, nutri_score, " \
+                  "store, ingredient, url) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            id_ = self.connector.execute(req, (product["name"],
+                                               product["brand"],
+                                               product["category"],
+                                               product["nutri_score"],
+                                               product["store"],
+                                               product["ingredients"],
+                                               product["url"]))
+            product["id"] = id_
+            return product
+        else:
+            print("Ce produit existe déjà dans la base de donnée.")
+            print("Produit n°{}, nom: {}".format(check["id"], check["name"]))
+            return check
 
     def update(self, product):
         """
@@ -463,7 +472,7 @@ class ProductManager:
                 The product we want to update in the table.
         """
         req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, " \
-              "nutri_score=%s, store=%s, ingredient=%s" \
+              "nutri_score=%s, store=%s, ingredient=%s, url=%s" \
               "WHERE id=%s"
         self.connector.execute(req, (product["name"],
                                      product["brand"],
@@ -471,6 +480,7 @@ class ProductManager:
                                      product["nutri_score"],
                                      product["store"],
                                      product["ingredient"],
+                                     product["url"],
                                      product["id"]))
 
     def select(self, name=None):
@@ -499,12 +509,15 @@ class ProductManager:
                                   "category": product[3],
                                   "nutriscore": product[4],
                                   "store": product[5],
-                                  "ingredient": product[6]}
+                                  "ingredient": product[6],
+                                  "url": product[7]}
                 list_product.append(product_return)
             return list_product
         if name is not None:
             try:
-                req = "SELECT id, name_product FROM Product " \
+                req = "SELECT id, name_product, brand, category, " \
+                      "nutri_score, store, ingredient, url " \
+                      "FROM Product " \
                       "WHERE name_product=%s;"
                 response = self.connector.select(req, (name,))
                 product = {"id": response[0][0],
@@ -513,7 +526,8 @@ class ProductManager:
                            "category": response[0][3],
                            "nutriscore": response[0][4],
                            "store": response[0][5],
-                           "ingredient": response[0][6]}
+                           "ingredient": response[0][6],
+                           "url": response[0][7]}
                 return product
             except IndexError:
                 return None
@@ -537,7 +551,7 @@ class ProductManager:
                  name.
         """
         req = "SELECT name_product, brand, category, nutri_score, store, " \
-              "ingredient FROM Product " \
+              "ingredient, url FROM Product " \
               "WHERE Product.id = %s"
         select = self.connector.select(req, (id_product,))
         product = {"id": id_product,
@@ -546,7 +560,8 @@ class ProductManager:
                    "category": select[0][2],
                    "nutriscore": select[0][3],
                    "store": select[0][4],
-                   "ingredient": select[0][5]}
+                   "ingredient": select[0][5],
+                   "url": select[0][6]}
         return product
 
 
