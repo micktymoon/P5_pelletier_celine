@@ -72,9 +72,11 @@ def associate_cat_to_product(cm, pcm, product):
         product : dict
             The product to whiwh we want to associate a category.
      """
-    product_cat = get_word_remove_spaces(product["category"])
-    for cat in product_cat:
+    print(product["category"])
+    for cat in product["category"]:
+        print(cat)
         check = cm.select(name=cat)
+        print(check)
         if check is None:
             category = {"name": cat}
             cm.insert(category)
@@ -102,8 +104,7 @@ def associate_store_to_product(sm, psm, product):
             product : dict
                 The product to whiwh we want to associate a store.
          """
-    product_store = get_word_remove_spaces(product["store"])
-    for sto in product_store:
+    for sto in product["store"]:
         check = sm.select(name=sto)
         if check is None:
             store = {"name": sto}
@@ -113,7 +114,7 @@ def associate_store_to_product(sm, psm, product):
             psm.insert_association(check["id"], product["id"])
 
 
-def associate_substitute_to_product(pm, pcm, subm, product):
+def associate_substitute_to_product(pm, pcm, product):
     """
     Associate a substitue to a product in the database.
 
@@ -152,9 +153,9 @@ def associate_substitute_to_product(pm, pcm, subm, product):
                 if prod["nutriscore"] < product["nutriscore"]:
                     list_substitute_possible.append(prod)
     if list_substitute_possible:
-        for sub in list_substitute_possible:
-            subm.insert_association(product["id"], sub["id"])
-        return True
+        # for sub in list_substitute_possible:
+        #     subm.insert_association(product["id"], sub["id"])
+        return list_substitute_possible
     if not list_substitute_possible:
         return False
 
@@ -259,7 +260,7 @@ def fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod):
         for product in api_list_prod:
             try:
                 get_store_and_add_to_db(sm, product["store"])
-                product = pm.insert(product)
+                product = pm.insert(pcm, psm, product)
                 associate_store_to_product(sm, psm, product)
             except mysql.connector.errors.Error as er:
                 print(er)

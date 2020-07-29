@@ -431,7 +431,7 @@ class ProductManager:
         req = "DELETE FROM Product WHERE id = %s"
         self.connector.execute(req, (id_delete,))
 
-    def insert(self, product):
+    def insert(self, pcm, psm, product):
         """
         Insert a product into the table.
 
@@ -442,7 +442,7 @@ class ProductManager:
             product: dict
                 The product we want to insert in the table.
         """
-        check = self.select(name=product["name"])
+        check = self.select(pcm, psm, name=product["name"])
         if check is None:
             req = "INSERT INTO Product " \
                   "(name_product, brand, category, nutri_score, " \
@@ -483,7 +483,7 @@ class ProductManager:
                                      product["url"],
                                      product["id"]))
 
-    def select(self, name=None):
+    def select(self, pcm, psm, name=None):
         """
         Get all the products of the table in a list and
         return this list.
@@ -506,11 +506,11 @@ class ProductManager:
                 product_return = {"id": product[0],
                                   "name": product[1],
                                   "brand": product[2],
-                                  "category": product[3],
                                   "nutriscore": product[4],
-                                  "store": product[5],
                                   "ingredient": product[6],
                                   "url": product[7]}
+                product_return["category"] = pcm.select_association(product_return["id"])
+                product_return["store"] = psm.select_association(product_return["id"])
                 list_product.append(product_return)
             return list_product
         if name is not None:
@@ -523,11 +523,11 @@ class ProductManager:
                 product = {"id": response[0][0],
                            "name": response[0][1],
                            "brand": response[0][2],
-                           "category": response[0][3],
                            "nutriscore": response[0][4],
-                           "store": response[0][5],
                            "ingredient": response[0][6],
                            "url": response[0][7]}
+                product["category"] = pcm.select_association(product["id"])
+                product["store"] = psm.select_association(product["id"])
                 return product
             except IndexError:
                 return None
@@ -772,9 +772,23 @@ class SubstituteManager:
               "WHERE Substitute.id_product=%s"
         response = self.connector.select(req, (id_product,))
         print(response)
-        substitute = {"id": response[0][0], "name": response[0][1]}
-        substitute["store"] = psm.select_association(substitute["id"])
-        substitute["category"] = pcm.select_association(substitute["id"])
-        product = pm.get(substitute["id"])
-        substitute["nutriscore"] = product["nutriscore"]
-        return substitute
+        list_sub = []
+        for sub in response:
+            substitute = {"id": sub[0], "name": sub[1]}
+            substitute["store"] = psm.select_association(substitute["id"])
+            substitute["category"] = pcm.select_association(substitute["id"])
+            product = pm.get(substitute["id"])
+            substitute["nutriscore"] = product["nutriscore"]
+            list_sub.append(substitute)
+        return list_sub
+
+    def select_substituted_product(self):
+        req = "SELECT id_product, Product.name_product" \
+              "FROM Substitute" \
+              "INNER JOIN Product ON Product.id=Substitute.id_product"
+        response = self.connector.select(req)
+        list_prod = []
+        for prod in response:
+            product = {"id": prod[0], "name": prod[1]}
+            list_prod.append(product)
+        return list_prod
