@@ -61,12 +61,8 @@ class MysqlConnector:
             info : tuple, optional
                 The informations we need to execute the request.
                 (default is empty)
-            **kwargs : ????????????????????????????????????, optional
+            **kwargs : multi=1, optional
                 The argument we need if we want to execute many requests.
-
-        execute('sql')
-        execute('sql %s', ('toto'))
-        execute('sql1;sql2;', multi=1)
         """
         cursor = self.connexion.cursor()
         try:
