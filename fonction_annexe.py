@@ -114,50 +114,7 @@ def associate_store_to_product(sm, psm, product):
             psm.insert_association(check["id"], product["id"])
 
 
-def associate_substitute_to_product(pm, pcm, product):
-    """
-    Associate a substitue to a product in the database.
 
-    Get a list of all the database products.
-    Get a list of all the product categories.
-    Retrieves the products having one of the categories of the product
-     in parameter.
-    If the list contains products, check if their nutriscore is lower than
-     that of the product in parameter.
-    If it's lower, associate the product as a substitute for the product
-     that we have put in parameter and return True.
-    If the list is empty returns False.
-
-    Parameters:
-        pm : class ProductManager
-            The manager of the Product table in the database.
-        pcm : class ProductCategoryManager
-            The manager of the ProductCategory table in the database.
-        subm : class SubstituteManager
-            The manager of the Substitute table in the database.
-        product : dict
-            The product to whiwh we want to associate a store.
-
-    Returns:
-        boolean
-            True if there is a list of substitutes and false if the list of
-             substitutes is empty.
-    """
-    list_product_bdd = pm.select()
-    list_cat_product = pcm.select_association(product["id"])
-    list_substitute_possible = []
-    for prod in list_product_bdd:
-        prod["category"] = pcm.select_association(prod["id"])
-        for cat in prod["category"]:
-            if cat in list_cat_product:
-                if prod["nutriscore"] < product["nutriscore"]:
-                    list_substitute_possible.append(prod)
-    if list_substitute_possible:
-        # for sub in list_substitute_possible:
-        #     subm.insert_association(product["id"], sub["id"])
-        return list_substitute_possible
-    if not list_substitute_possible:
-        return False
 
 
 def input_int(text):
