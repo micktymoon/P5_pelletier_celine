@@ -3,6 +3,7 @@
 
 import json
 import requests
+from fonction_annexe import get_word_remove_spaces
 
 
 class ApiManageSearch:
@@ -42,14 +43,14 @@ class ApiManageSearch:
         response_text = json.loads(response.text)
         i = 0
         list_product = []
-        while i < 2:
+        while i < len(response_text):
             path = response_text["products"][i]
             final_product = {"name": path["product_name"],
                              "brand": path.get("brands", None),
-                             "category": path.get("categories", None),
+                             "category": get_word_remove_spaces(path.get("categories", None)),
                              "nutri_score": path.get(
                                  "nutriscore_grade", None),
-                             "store": path.get("stores", None),
+                             "store": get_word_remove_spaces(path.get("stores", None)),
                              "ingredients": path.get(
                                  "ingredients_text", None),
                              "url": path["url"]}

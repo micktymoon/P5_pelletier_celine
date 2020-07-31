@@ -41,12 +41,11 @@ def get_store_and_add_to_db(sm, text):
         text : str
             The text from which we want to retrieve the stores.
     """
-    list_words = text.split(",")
     store_db = sm.select()
     list_store_db = []
     for sto in store_db:
         list_store_db.append(sto["name"])
-    for word in list_words:
+    for word in text:
         word = word.strip()
         store = {"name": word}
         if store["name"] not in list_store_db:
@@ -72,11 +71,8 @@ def associate_cat_to_product(cm, pcm, product):
         product : dict
             The product to whiwh we want to associate a category.
      """
-    print(product["category"])
     for cat in product["category"]:
-        print(cat)
         check = cm.select(name=cat)
-        print(check)
         if check is None:
             category = {"name": cat}
             cm.insert(category)
@@ -112,9 +108,6 @@ def associate_store_to_product(sm, psm, product):
             psm.insert_association(store["id"], product["id"])
         else:
             psm.insert_association(check["id"], product["id"])
-
-
-
 
 
 def input_int(text):
@@ -214,15 +207,18 @@ def fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod):
     """
     for name_prod in list_name_prod:
         api_list_prod = api_search.search_product(name_prod)
-        for product in api_list_prod:
+        for product in api_list_prod[:2]:
             try:
                 get_store_and_add_to_db(sm, product["store"])
-                product = pm.insert(pcm, psm, product)
+                product = pm.insert(pcm, psm, product=product)
                 associate_store_to_product(sm, psm, product)
+                product["store"] = psm.select_association(product["id"])
             except mysql.connector.errors.Error as er:
                 print(er)
             try:
                 associate_cat_to_product(cm, pcm, product)
+                product["category"] = pcm.select_association(product["id"])
             except mysql.connector.errors.InternalError:
                 associate_cat_to_product(cm, pcm, product)
+                product["category"] = pcm.select_association(product["id"])
                 print("l'association des catégorie à quand même été faite")

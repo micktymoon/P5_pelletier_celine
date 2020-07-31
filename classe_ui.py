@@ -20,7 +20,7 @@ class UserInterfaceManager:
             substitute_proposal()
                 Proposes a substitute for the chosen product to the user.
     """
-    def __init__(self, cm, pm, pcm, psm, subm):
+    def __init__(self, cm, pm, pcm, psm, subm, api):
         """
         UserInterfaceManager class constructor.
 
@@ -32,24 +32,28 @@ class UserInterfaceManager:
         self.pcm = pcm
         self.psm = psm
         self.subm = subm
-        self.choice1 = None
-        self.choice_cat = None
-        self.choice_prod = None
+        self.api = api
         self.substitute = None
         self.list_sub = None
-        self.save = None
 
     def main_menu(self):
         while True:
-            print("Que souhaitez-vous faire?"
-                  "1 : Quel aliment souhaitez-vous remplacer?"
-                  "2 : Retrouver mes aliments substitutés."
+            print("Que souhaitez-vous faire?\n"
+                  "1 : Quel aliment souhaitez-vous remplacer?\n"
+                  "2 : Retrouver mes aliments substitutés.\n"
                   "3 : Quitter")
             choice = input_int("Entrer le nombre correspondant à votre choix.")
             if choice == 1:
                 self.choice_category()
             elif choice == 2:
-                self.choice1 = 2
+                choice = self.show_substitute(self.subm, self.psm, self.pcm, self.pm)
+                for prod in self.list_sub:
+                    if choice == prod["id"]:
+                        self.suggest_substitute(prod)
+                    elif choice == 0:
+                        quit()
+                    elif choice == -1:
+                        return
             elif choice == 3:
                 print("A bientôt.")
                 quit()
@@ -65,45 +69,66 @@ class UserInterfaceManager:
             choice = input_int("Entrer le nombre correspondant à votre choix.")
             for cat in list_cat:
                 if choice == cat["id"]:
-                    self.choice_product()
+                    self.choice_product(self.pcm, self.psm, cat)
                 elif choice == 0:
                     print("A bientôt.")
                     quit()
                 elif choice == -1:
                     return
 
-    def choice_product(self):
-        print("Voici la liste des aliments de la"
-              " catégorie: {}".format(self.choice_cat))
-        print("Entrez 0 si vous désirez quitter.")
-        print("Entrez -1 si vous désirez retourner au menu précédent.")
-        list_product = self.pm.select()
-        for prod in list_product:
-            print("{} : {}, nutri-score = {}".format(prod["id"],
-                                                     prod["name"],
-                                                     prod["nutriscore"]))
-        choice = input_int("Entrer le nombre correspondant à votre choix.")
-        for prod in list_product:
-            if choice == prod["id"]:
-                list_sub = self.subm.associate_substitute_to_product(self.pm,
-                                                                     self.pcm,
-                                                                     choice)
-                if list_sub:
-                    for sub in list_sub:
-                        print("Produit n°{}: {}, magasins où le trouver: {}, url "
-                              "OpenFoodFact: {}.".format(sub["id"],
-                                                         sub["name"],
-                                                         sub["store"],
-                                                         sub["url"]))
-                    self.save_substitute(list_sub, self.subm, prod)
-            elif choice == 0:
-                print("A bientôt.")
-                quit()
-            elif choice == -1:
-                return
+    def choice_product(self, pcm, psm, category):
+        while True:
+            print("Voici la liste des aliments de la"
+                  " catégorie: {}".format(category["name"]))
+            print("Entrez 0 si vous désirez quitter.")
+            print("Entrez -1 si vous désirez retourner au menu précédent.")
+            list_product = self.pm.select(pcm, psm)
+            list_prod_cat = []
+            for prod in list_product:
+                for cat in prod["category"]:
+                    if cat == category["name"]:
+                        list_prod_cat.append(prod)
+                        print("{} : {}, nutri-score = {}".format(prod["id"],
+                                                                 prod["name"],
+                                                                 prod["nutriscore"]))
+            choice = input_int("Entrer le nombre correspondant à votre choix.")
+            for prod in list_prod_cat:
+                if choice == prod["id"]:
+                    list_sub = self.subm.associate_substitute_to_product(self.pm,
+                                                                         self.pcm,
+                                                                         self.psm,
+                                                                         prod)
+                    list_sub.sort(key=lambda d: d["nutriscore"])
+                    print(list_sub)
+                    if list_sub:
+                        for sub in list_sub:
+                            print("Produit n°{}: {}, magasins où le trouver: {}, nutri-score: {}, url "
+                                  "OpenFoodFact: {}.".format(sub["id"],
+                                                             sub["name"],
+                                                             sub["store"],
+                                                             sub["nutriscore"],
+                                                             sub["url"]))
+                        self.save_substitute(list_sub, self.subm, prod)
+                    if not list_sub:
+                        list_api_search = self.api.search_product(prod["name"])
+                        self.pm.insert(self.pcm, self.psm, list_prod=list_api_search)
+                        list_sub_possible = self.subm.associate_substitute_to_product(self.pm, self.pcm, self.psm, prod)
+                        for sub in list_sub_possible:
+                            print("Produit n°{}: {}, magasins où le trouver: {}, nutri-score: {}, url "
+                                  "OpenFoodFact: {}.".format(sub["id"],
+                                                             sub["name"],
+                                                             sub["store"],
+                                                             sub["nutriscore"],
+                                                             sub["url"]))
+                        self.save_substitute(list_sub, self.subm, prod)
+                elif choice == 0:
+                    print("A bientôt.")
+                    quit()
+                elif choice == -1:
+                    return
 
-    def suggest_substitute(self):
-        list_substitute = self.subm.select_association(self.choice_prod["id"],
+    def suggest_substitute(self, product):
+        list_substitute = self.subm.select_association(product["id"],
                                                        self.psm,
                                                        self.pcm,
                                                        self.pm)
@@ -130,34 +155,17 @@ class UserInterfaceManager:
 
         Returns:
 
-
         """
-
-        # list_product_bdd = pm.select()
-        # list_cat_product = pcm.select_association(product["id"])
-        # list_substitute_possible = []
-        # for prod in list_product_bdd:
-        #     prod["category"] = pcm.select_association(prod["id"])
-        #     for cat in prod["category"]:
-        #         if cat in list_cat_product:
-        #             if prod["nutriscore"] < product["nutriscore"]:
-        #                 list_substitute_possible.append(prod)
-        # if list_substitute_possible:
-        print("Voulez vous sauvegarder les substitues? \n"
-              )
+        print("Voulez vous sauvegarder les substitues?")
         choice = input("Entrez 'o' pour oui ou 'n' pour non")
         if choice == "o":
             for sub in list_sub:
                 subm.insert_association(product["id"], sub["id"])
-            self.save = True
         if choice == "n":
-            self.save = False
-        # if not list_substitute_possible:
-        #     self.save = False
+            pass
 
     def show_substitute(self, subm, psm, pcm, pm):
-
-        list_substituted_prod = subm.select_substituted_product()
+        list_substituted_prod = self.subm.select_substituted_product()
         print("Voici les produits ayant un substitut:")
         for product in list_substituted_prod:
             print("Produit n°{}: {}".format(product["id"], product["name"]))
@@ -170,32 +178,32 @@ class UserInterfaceManager:
                 return product["id"]
 
 
-class Toto(object):
-
-    def main_menu(self):
-        c = input_int()
-        if c == 1:
-            self.choice_categ()
-
-    def choice_categ(self):
-        print('')
-        cat = input_int()
-        self.show_categ(cat)
-
-    def show_categ(self, cat):
-        print()
-        while True:
-
-            prod = input_int()
-            if prod == -1:
-                break
-
-            self.show_product(prod)
-
-
-    def show_product(self, prod):
-        print(prod)
-        action = input_int()
-        if action == 3:
-            return
-
+# class Toto(object):
+#
+#     def main_menu(self):
+#         c = input_int()
+#         if c == 1:
+#             self.choice_categ()
+#
+#     def choice_categ(self):
+#         print('')
+#         cat = input_int()
+#         self.show_categ(cat)
+#
+#     def show_categ(self, cat):
+#         print()
+#         while True:
+#
+#             prod = input_int()
+#             if prod == -1:
+#                 break
+#
+#             self.show_product(prod)
+#
+#
+#     def show_product(self, prod):
+#         print(prod)
+#         action = input_int()
+#         if action == 3:
+#             return
+#

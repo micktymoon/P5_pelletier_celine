@@ -431,7 +431,7 @@ class ProductManager:
         req = "DELETE FROM Product WHERE id = %s"
         self.connector.execute(req, (id_delete,))
 
-    def insert(self, pcm, psm, product):
+    def insert(self, pcm, psm, product=None, list_prod=None):
         """
         Insert a product into the table.
 
@@ -442,24 +442,43 @@ class ProductManager:
             product: dict
                 The product we want to insert in the table.
         """
-        check = self.select(pcm, psm, name=product["name"])
-        if check is None:
-            req = "INSERT INTO Product " \
-                  "(name_product, brand, category, nutri_score, " \
-                  "store, ingredient, url) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            id_ = self.connector.execute(req, (product["name"],
-                                               product["brand"],
-                                               product["category"],
-                                               product["nutri_score"],
-                                               product["store"],
-                                               product["ingredients"],
-                                               product["url"]))
-            product["id"] = id_
-            return product
-        else:
-            print("Ce produit existe déjà dans la base de donnée.")
-            print("Produit n°{}, nom: {}".format(check["id"], check["name"]))
-            return check
+        if product is not None:
+            check = self.select(pcm, psm, name=product["name"])
+            if check is None:
+                req = "INSERT INTO Product " \
+                      "(name_product, brand, nutri_score, " \
+                      "ingredient, url) VALUES (%s, %s, %s, %s, %s)"
+                id_ = self.connector.execute(req, (product["name"],
+                                                   product["brand"],
+                                                   product["nutri_score"],
+                                                   product["ingredients"],
+                                                   product["url"]))
+                product["id"] = id_
+                return product
+            else:
+                print("Ce produit existe déjà dans la base de donnée.")
+                print("Produit n°{}, nom: {}".format(check["id"], check["name"]))
+                return check
+        if list_prod is not None:
+            for product in list_prod:
+                check = self.select(pcm, psm, name=product["name"])
+                if check is None:
+                    req = "INSERT INTO Product " \
+                          "(name_product, brand, category, nutri_score, " \
+                          "store, ingredient, url) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    id_ = self.connector.execute(req, (product["name"],
+                                                       product["brand"],
+                                                       product["category"],
+                                                       product["nutri_score"],
+                                                       product["store"],
+                                                       product["ingredients"],
+                                                       product["url"]))
+                    product["id"] = id_
+                    return product
+                else:
+                    print("Ce produit existe déjà dans la base de donnée.")
+                    print("Produit n°{}, nom: {}".format(check["id"], check["name"]))
+                    return check
 
     def update(self, product):
         """
@@ -783,8 +802,8 @@ class SubstituteManager:
         return list_sub
 
     def select_substituted_product(self):
-        req = "SELECT id_product, Product.name_product" \
-              "FROM Substitute" \
+        req = "SELECT id_product, Product.name_product " \
+              "FROM Substitute " \
               "INNER JOIN Product ON Product.id=Substitute.id_product"
         response = self.connector.select(req)
         list_prod = []
@@ -793,7 +812,7 @@ class SubstituteManager:
             list_prod.append(product)
         return list_prod
 
-    def associate_substitute_to_product(self, pm, pcm, product):
+    def associate_substitute_to_product(self, pm, pcm, psm, product):
         """
         Associate a substitue to a product in the database.
 
@@ -822,7 +841,7 @@ class SubstituteManager:
                 True if there is a list of substitutes and false if the list of
                  substitutes is empty.
         """
-        list_product_bdd = pm.select()
+        list_product_bdd = pm.select(pcm, psm)
         list_cat_product = pcm.select_association(product["id"])
         list_substitute_possible = []
         for prod in list_product_bdd:
@@ -832,8 +851,6 @@ class SubstituteManager:
                     if prod["nutriscore"] < product["nutriscore"]:
                         list_substitute_possible.append(prod)
         if list_substitute_possible:
-            # for sub in list_substitute_possible:
-            #     subm.insert_association(product["id"], sub["id"])
             return list_substitute_possible
         if not list_substitute_possible:
             return False
