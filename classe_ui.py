@@ -56,25 +56,25 @@ class UserInterfaceManager:
                         return
             elif choice == 3:
                 print("A bientôt.")
-                quit()
+                break
 
     def choice_category(self):
         while True:
             print("Voici la liste des catégories :")
-            print("Entrez 0 si vous désirez quitter.")
             print("Entrez -1 si vous désirez retourner au menu précédent.")
             list_cat = self.cm.select()
             for cat in list_cat:
                 print("{} : {}".format(cat["id"], cat["name"]))
             choice = input_int("Entrer le nombre correspondant à votre choix.")
+            if choice == -1:
+                return
+            found = None
             for cat in list_cat:
                 if choice == cat["id"]:
-                    self.choice_product(self.pcm, self.psm, cat)
-                elif choice == 0:
-                    print("A bientôt.")
-                    quit()
-                elif choice == -1:
-                    return
+                    found = cat
+                    break
+            if found:
+                self.choice_product(self.pcm, self.psm, found)
 
     def choice_product(self, pcm, psm, category):
         while True:
@@ -98,9 +98,9 @@ class UserInterfaceManager:
                                                                          self.pcm,
                                                                          self.psm,
                                                                          prod)
-                    list_sub.sort(key=lambda d: d["nutriscore"])
                     print(list_sub)
                     if list_sub:
+                        list_sub.sort(key=lambda d: d["nutriscore"])
                         for sub in list_sub:
                             print("Produit n°{}: {}, magasins où le trouver: {}, nutri-score: {}, url "
                                   "OpenFoodFact: {}.".format(sub["id"],
@@ -109,7 +109,7 @@ class UserInterfaceManager:
                                                              sub["nutriscore"],
                                                              sub["url"]))
                         self.save_substitute(list_sub, self.subm, prod)
-                    if not list_sub:
+                    if list_sub is None:
                         list_api_search = self.api.search_product(prod["name"])
                         self.pm.insert(self.pcm, self.psm, list_prod=list_api_search)
                         list_sub_possible = self.subm.associate_substitute_to_product(self.pm, self.pcm, self.psm, prod)

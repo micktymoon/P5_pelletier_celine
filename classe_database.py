@@ -844,13 +844,17 @@ class SubstituteManager:
         list_product_bdd = pm.select(pcm, psm)
         list_cat_product = pcm.select_association(product["id"])
         list_substitute_possible = []
+
         for prod in list_product_bdd:
             prod["category"] = pcm.select_association(prod["id"])
+            match = False
             for cat in prod["category"]:
                 if cat in list_cat_product:
                     if prod["nutriscore"] < product["nutriscore"]:
-                        list_substitute_possible.append(prod)
+                        match = True
+            if match:
+                list_substitute_possible.append(prod)
         if list_substitute_possible:
             return list_substitute_possible
         if not list_substitute_possible:
-            return False
+            return None

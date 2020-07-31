@@ -4,7 +4,7 @@
 import mysql.connector
 from classe_mysqlconnector import MysqlConnector
 from classe_database import DatabaseManager, CategoryManager, ProductManager, StoreManager, ProductCategoryManager, ProductStoreManager
-from classe_api import ApiSearch
+from classe_api import ApiManageSearch
 from fonction_annexe import get_store_and_add_to_db, associate_cat_to_product, associate_store_to_product
 
 connector = MysqlConnector("localhost", "root", "cP93*mR78.")
@@ -32,18 +32,19 @@ for cat in list_categories:
 
 print("Les catégories ont été insérées")
 
-product = ["evian", "jus de pomme", "sprite", "prince", "kinder maxi", "pizza regina",
-           "pizza 4 fromages", "magnum amande", "glace vanille", "camembert", "sainte maure"]
-api_search = ApiSearch()
+list_name_product = ["evian", "jus de pomme", "sprite", "prince", "kinder maxi",
+                "pizza regina", "pizza 4 fromages", "magnum amande",
+                "glace vanille", "camembert", "sainte maure"]
+api_search = ApiManageSearch()
 
 cm = CategoryManager(connector1)
 sm = StoreManager(connector1)
 pm = ProductManager(connector1)
 pcm = ProductCategoryManager(connector1)
 psm = ProductStoreManager(connector1)
-for pdt in product:
-    prdct = api_search.search_product(pdt)
-    for product in prdct:
+for name_product in list_name_product:
+    api_list_product = api_search.search_product(name_product)
+    for product in api_list_product:
         try:
             get_store_and_add_to_db(sm, product["store"])
             pm.insert(product)

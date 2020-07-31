@@ -1,3 +1,4 @@
+flake8
 json
 requests
 mysql-connector-python
