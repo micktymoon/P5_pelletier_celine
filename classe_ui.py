@@ -46,14 +46,7 @@ class UserInterfaceManager:
             if choice == 1:
                 self.choice_category()
             elif choice == 2:
-                choice = self.show_substitute(self.subm, self.psm, self.pcm, self.pm)
-                for prod in self.list_sub:
-                    if choice == prod["id"]:
-                        self.suggest_substitute(prod)
-                    elif choice == 0:
-                        quit()
-                    elif choice == -1:
-                        return
+                self.substitute_menu()
             elif choice == 3:
                 print("A bientôt.")
                 break
@@ -121,11 +114,16 @@ class UserInterfaceManager:
                                                              sub["nutriscore"],
                                                              sub["url"]))
                         self.save_substitute(list_sub, self.subm, prod)
-                elif choice == 0:
-                    print("A bientôt.")
-                    quit()
                 elif choice == -1:
                     return
+
+    def substitute_menu(self):
+        choice = self.show_substitute(self.subm, self.psm, self.pcm, self.pm)
+        for prod in self.list_sub:
+            if choice == prod["id"]:
+                self.suggest_substitute(prod)
+            elif choice == -1:
+                return
 
     def suggest_substitute(self, product):
         list_substitute = self.subm.select_association(product["id"],
