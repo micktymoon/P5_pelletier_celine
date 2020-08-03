@@ -212,13 +212,13 @@ def fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod):
                 get_store_and_add_to_db(sm, product["store"])
                 product = pm.insert(pcm, psm, product=product)
                 associate_store_to_product(sm, psm, product)
-                product["store"] = psm.select_association(product["id"])
+                product["store"] = psm.select_association_with_id_prod(product["id"])
             except mysql.connector.errors.Error as er:
                 print(er)
             try:
                 associate_cat_to_product(cm, pcm, product)
-                product["category"] = pcm.select_association(product["id"])
+                product["category"] = pcm.select_association_with_id_prod(product["id"])
             except mysql.connector.errors.InternalError:
                 associate_cat_to_product(cm, pcm, product)
-                product["category"] = pcm.select_association(product["id"])
+                product["category"] = pcm.select_association_with_id_prod(product["id"])
                 print("l'association des catégorie à quand même été faite")

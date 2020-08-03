@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
+from fonction_annexe import get_store_and_add_to_db, associate_store_to_product, associate_cat_to_product
 
 
 class DatabaseManager:
@@ -528,8 +529,8 @@ class ProductManager:
                                   "nutriscore": product[4],
                                   "ingredient": product[6],
                                   "url": product[7]}
-                product_return["category"] = pcm.select_association(product_return["id"])
-                product_return["store"] = psm.select_association(product_return["id"])
+                product_return["category"] = pcm.select_association_with_id_prod(product_return["id"])
+                product_return["store"] = psm.select_association_with_id_prod(product_return["id"])
                 list_product.append(product_return)
             return list_product
         if name is not None:
@@ -545,8 +546,8 @@ class ProductManager:
                            "nutriscore": response[0][4],
                            "ingredient": response[0][6],
                            "url": response[0][7]}
-                product["category"] = pcm.select_association(product["id"])
-                product["store"] = psm.select_association(product["id"])
+                product["category"] = pcm.select_association_with_id_prod(product["id"])
+                product["store"] = psm.select_association_with_id_prod(product["id"])
                 return product
             except IndexError:
                 return None
@@ -630,7 +631,7 @@ class ProductCategoryManager:
               "VALUES (%s, %s)"
         self.connector.execute(req, (id_product, id_cat))
 
-    def select_association(self, id_product):
+    def select_association_with_id_prod(self, id_product):
         """
         Get the associations of a product with its categories and return them.
 
@@ -653,6 +654,21 @@ class ProductCategoryManager:
         for cat in response:
             list_cat.append(cat[0])
         return list_cat
+
+    def select_association_with_cat(self, category_name):
+        req = "SELECT Product.name_product FROM Product" \
+              "INNER JOIN ProductCategory " \
+              "ON ProductCategory.id_product = Product.id " \
+              "INNER JOIN Categories " \
+              "ON Categories.id = ProductCategory.id_product_cat " \
+              "WHERE Categories.name_cat = %s"
+
+        response = self.connector.select(req, (category_name,))
+        list_prod = []
+        for prod in response:
+            product = {"id": prod[0], "name": prod[1]}
+            list_prod.append(product)
+        return list_prod
 
 
 class ProductStoreManager:
@@ -794,8 +810,8 @@ class SubstituteManager:
         list_sub = []
         for sub in response:
             substitute = {"id": sub[0], "name": sub[1]}
-            substitute["store"] = psm.select_association(substitute["id"])
-            substitute["category"] = pcm.select_association(substitute["id"])
+            substitute["store"] = psm.select_association_with_id_prod(substitute["id"])
+            substitute["category"] = pcm.select_association_with_id_prod(substitute["id"])
             product = pm.get(substitute["id"])
             substitute["nutriscore"] = product["nutriscore"]
             list_sub.append(substitute)
@@ -812,7 +828,7 @@ class SubstituteManager:
             list_prod.append(product)
         return list_prod
 
-    def associate_substitute_to_product(self, pm, pcm, psm, product):
+    def associate_substitute_to_product(self, pm, cm, sm, pcm, psm, api, product):
         """
         Associate a substitue to a product in the database.
 
@@ -842,11 +858,11 @@ class SubstituteManager:
                  substitutes is empty.
         """
         list_product_bdd = pm.select(pcm, psm)
-        list_cat_product = pcm.select_association(product["id"])
+        list_cat_product = pcm.select_association_with_id_prod(product["id"])
         list_substitute_possible = []
 
         for prod in list_product_bdd:
-            prod["category"] = pcm.select_association(prod["id"])
+            prod["category"] = pcm.select_association_with_id_prod(prod["id"])
             match = False
             for cat in prod["category"]:
                 if cat in list_cat_product:
@@ -857,4 +873,18 @@ class SubstituteManager:
         if list_substitute_possible:
             return list_substitute_possible
         if not list_substitute_possible:
-            return None
+            research = api.search_product(product["name"])
+            match = False
+            for prod in research:
+                pdt = None
+                if prod["nutriscore"] < product["nutriscore"]:
+                    match = True
+                    get_store_and_add_to_db(sm, prod["store"])
+                    pdt = pm.insert(pcm, psm, product=prod)
+                    associate_store_to_product(sm, psm, pdt)
+                    pdt["store"] = psm.select_association_with_id_prod(pdt["id"])
+                    associate_cat_to_product(cm, pcm, pdt)
+                    pdt["category"] = pcm.select_association_with_id_prod(pdt["id"])
+                if match:
+                    list_substitute_possible.append(pdt)
+            return list_substitute_possible

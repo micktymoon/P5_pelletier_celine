@@ -71,4 +71,4 @@ for name_product in list_name_product:
             pass
 
 print("les produit ont été ajouté et associé à leurs catégories")
-print(pcm.select_association(11))
+print(pcm.select_association_with_id_prod(11))
