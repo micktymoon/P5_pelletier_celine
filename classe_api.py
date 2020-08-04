@@ -44,16 +44,24 @@ class ApiManageSearch:
         i = 0
         list_product = []
         while i < len(response_text):
-            path = response_text["products"][i]
-            final_product = {"name": path["product_name"],
-                             "brand": path.get("brands", None),
-                             "category": get_word_remove_spaces(path.get("categories", None)),
-                             "nutriscore": path.get(
-                                 "nutriscore_grade", None),
-                             "store": get_word_remove_spaces(path.get("stores", None)),
-                             "ingredients": path.get(
-                                 "ingredients_text", None),
-                             "url": path["url"]}
-            list_product.append(final_product)
-            i += 1
+            try:
+                path = response_text["products"][i]
+                final_product = {"name": path["product_name"],
+                                 "brand": path.get("brands", None),
+                                 "category": get_word_remove_spaces(path.get("categories", None)),
+                                 "nutriscore": path.get(
+                                     "nutriscore_grade", None),
+                                 "store": get_word_remove_spaces(path.get("stores", None)),
+                                 "ingredients": path.get(
+                                     "ingredients_text", None),
+                                 "url": path.get("url", None)}
+                if final_product["url"] is None:
+                    beginning = "https://fr.openfoodfacts.org/produit/"
+                    id_prod = path["code"]
+                    final_product["url"] = beginning + id_prod
+                list_product.append(final_product)
+                i += 1
+            except IndexError:
+                i += 1
+                pass
         return list_product
