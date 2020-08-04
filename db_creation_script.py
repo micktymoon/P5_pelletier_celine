@@ -5,7 +5,7 @@ from classe_mysqlconnector import MysqlConnector
 from classe_database import CategoryManager, ProductManager, StoreManager,\
     ProductCategoryManager, ProductStoreManager
 from classe_api import ApiManageSearch
-from function_updating_db import create_db_and_table, insert_first_cat, fill_db
+from db_creation_function import create_db_and_table, insert_first_cat, fill_db
 
 
 def main():
@@ -20,9 +20,9 @@ def main():
     psm = ProductStoreManager(connector)
     list_categories = ["Boissons",
                        "Snacks",
-                       "Pizza",
-                       "Dessert",
-                       "Fromage"]
+                       "Pizzas",
+                       "Desserts",
+                       "Fromages"]
     list_name_prod = ["evian", "jus de pomme", "sprite", "prince", "kinder maxi",
                       "pizza regina", "pizza 4 fromages", "magnum amande",
                       "glace vanille", "camembert", "sainte maure"]
