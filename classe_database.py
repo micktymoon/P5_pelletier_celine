@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
-from fonction_annexe import get_store_and_add_to_db, associate_store_to_product, associate_cat_to_product
+from function_updating_db import insert_product_db
 
 
 class DatabaseManager:
@@ -530,7 +530,7 @@ class ProductManager:
                                   "ingredient": product[6],
                                   "url": product[7]}
                 product_return["category"] = pcm.select_association_with_id_prod(product_return["id"])
-                product_return["store"] = psm.select_association_with_id_prod(product_return["id"])
+                product_return["store"] = psm.select_association(product_return["id"])
                 list_product.append(product_return)
             return list_product
         if name is not None:
@@ -656,7 +656,8 @@ class ProductCategoryManager:
         return list_cat
 
     def select_association_with_cat(self, category_name):
-        req = "SELECT Product.name_product FROM Product" \
+        req = "SELECT Product.id,Product.name_product,Product.nutri_score " \
+              "FROM Product " \
               "INNER JOIN ProductCategory " \
               "ON ProductCategory.id_product = Product.id " \
               "INNER JOIN Categories " \
@@ -666,7 +667,7 @@ class ProductCategoryManager:
         response = self.connector.select(req, (category_name,))
         list_prod = []
         for prod in response:
-            product = {"id": prod[0], "name": prod[1]}
+            product = {"id": prod[0], "name": prod[1], "nutriscore": prod[2]}
             list_prod.append(product)
         return list_prod
 
@@ -800,20 +801,17 @@ class SubstituteManager:
             list
                 A list of the associations of a product with its substitutes.
         """
-        req = "SELECT Product.id, Product.name_product  " \
+        req = "SELECT Product.id, Product.name_product, Product.nutri_score, Product.url  " \
               "FROM Product " \
               "INNER JOIN Substitute " \
               "ON Product.id = Substitute.id_product_substitute " \
               "WHERE Substitute.id_product=%s"
         response = self.connector.select(req, (id_product,))
-        print(response)
         list_sub = []
         for sub in response:
-            substitute = {"id": sub[0], "name": sub[1]}
-            substitute["store"] = psm.select_association_with_id_prod(substitute["id"])
+            substitute = {"id": sub[0], "name": sub[1], "nutriscore": sub[2], "url": sub[3]}
+            substitute["store"] = psm.select_association(substitute["id"])
             substitute["category"] = pcm.select_association_with_id_prod(substitute["id"])
-            product = pm.get(substitute["id"])
-            substitute["nutriscore"] = product["nutriscore"]
             list_sub.append(substitute)
         return list_sub
 
@@ -879,12 +877,7 @@ class SubstituteManager:
                 pdt = None
                 if prod["nutriscore"] < product["nutriscore"]:
                     match = True
-                    get_store_and_add_to_db(sm, prod["store"])
-                    pdt = pm.insert(pcm, psm, product=prod)
-                    associate_store_to_product(sm, psm, pdt)
-                    pdt["store"] = psm.select_association_with_id_prod(pdt["id"])
-                    associate_cat_to_product(cm, pcm, pdt)
-                    pdt["category"] = pcm.select_association_with_id_prod(pdt["id"])
+                    pdt = insert_product_db(pm, cm, sm, pcm, psm, prod)
                 if match:
                     list_substitute_possible.append(pdt)
             return list_substitute_possible

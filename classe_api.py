@@ -3,7 +3,7 @@
 
 import json
 import requests
-from fonction_annexe import get_word_remove_spaces
+from tool_function import get_word_remove_spaces
 
 
 class ApiManageSearch:
@@ -48,7 +48,7 @@ class ApiManageSearch:
             final_product = {"name": path["product_name"],
                              "brand": path.get("brands", None),
                              "category": get_word_remove_spaces(path.get("categories", None)),
-                             "nutri_score": path.get(
+                             "nutriscore": path.get(
                                  "nutriscore_grade", None),
                              "store": get_word_remove_spaces(path.get("stores", None)),
                              "ingredients": path.get(

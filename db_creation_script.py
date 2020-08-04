@@ -5,7 +5,7 @@ from classe_mysqlconnector import MysqlConnector
 from classe_database import CategoryManager, ProductManager, StoreManager,\
     ProductCategoryManager, ProductStoreManager
 from classe_api import ApiManageSearch
-from fonction_annexe import create_db_and_table, insert_first_cat, fill_db
+from function_updating_db import create_db_and_table, insert_first_cat, fill_db
 
 
 def main():
