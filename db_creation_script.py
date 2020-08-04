@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
 
+import mysql.connector
 from classe_mysqlconnector import MysqlConnector
 from classe_database import CategoryManager, ProductManager, StoreManager,\
     ProductCategoryManager, ProductStoreManager
@@ -23,11 +24,15 @@ def main():
                        "Pizzas",
                        "Desserts",
                        "Fromages"]
-    list_name_prod = ["evian", "jus de pomme", "sprite", "prince", "kinder maxi",
+    list_name_prod = ["eau", "jus de pomme", "sprite", "prince", "kinder",
                       "pizza regina", "pizza 4 fromages", "magnum amande",
                       "glace vanille", "camembert", "sainte maure"]
     insert_first_cat(list_categories, connector)
-    fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod)
+    try:
+        fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod)
+    except mysql.connector.errors.InternalError:
+        fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod)
+
 
 
 if __name__ == "__main__":

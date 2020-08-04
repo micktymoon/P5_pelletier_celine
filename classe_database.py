@@ -451,7 +451,7 @@ class ProductManager:
                       "ingredient, url) VALUES (%s, %s, %s, %s, %s)"
                 id_ = self.connector.execute(req, (product["name"],
                                                    product["brand"],
-                                                   product["nutri_score"],
+                                                   product["nutriscore"],
                                                    product["ingredients"],
                                                    product["url"]))
                 product["id"] = id_
@@ -547,7 +547,7 @@ class ProductManager:
                            "ingredient": response[0][6],
                            "url": response[0][7]}
                 product["category"] = pcm.select_association_with_id_prod(product["id"])
-                product["store"] = psm.select_association_with_id_prod(product["id"])
+                product["store"] = psm.select_association(product["id"])
                 return product
             except IndexError:
                 return None
