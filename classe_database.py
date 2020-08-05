@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
+
 from function_updating_db import insert_product_db
 
 
 class DatabaseManager:
     """
-        Class which manages the database.
+    Class which manages the database.
 
     Attributes:
         connector : Class MysqlConnector
@@ -25,7 +26,7 @@ class DatabaseManager:
 
     def __init__(self, connector):
         """
-        DatebaseManager class constructor.
+        DatabaseManager class constructor.
 
         Parameters:
             connector : Class MysqlConnector
@@ -34,7 +35,8 @@ class DatabaseManager:
         self.connector = connector
 
     def create_db(self):
-        """Create the database "purBeurre".
+        """
+        Create the database "purBeurre".
 
         Execute the SQL request which allows to create the database.
         """
@@ -42,7 +44,8 @@ class DatabaseManager:
         self.connector.execute(req)
 
     def erase_db(self):
-        """Delete the database "purBeurre".
+        """
+        Delete the database "purBeurre".
 
         Execute the SQL request which allows you to delete the database.
         """
@@ -50,7 +53,8 @@ class DatabaseManager:
         self.connector.execute(req)
 
     def create_table(self):
-        """Create the table that compose our database.
+        """
+        Create the table that compose our database.
 
         Execute the SQL requests which will create all the tables that the
          database needs.
@@ -129,11 +133,11 @@ class CategoryManager:
         update(category)
             Updates a category of the table.
 
-        select()
-            Get all the categories of the table in a list and
-             return this list.
+        select(name)
+            Get all the categories from the table, or just a given category,
+             and return them.
 
-        get()
+        get(id_cat)
             Get a category from the table and returns it.
     """
 
@@ -193,16 +197,26 @@ class CategoryManager:
 
     def select(self, name=None):
         """
-        Get all the categories of the table in a list and
-         return this list.
+        Get all the categories from the table, or just a given category,
+         and return them.
 
-        Execute the SQL request which retrieves all the categories from
+        If there is no category given in the "name" parameter:
+        Execute the SQL query which retrieves all the categories from
          the table, transforms each category into a dictionary comprising
          the ID and the name, and returns a list of all these categories.
+        If there is a category given in the "name" parameter:
+        Execute the SQL query which retrieves the category, given as a
+         parameter, of the table, transforms it into a dictionary comprising
+         an ID and a name, and returns it.
 
+        Parameters:
+            name: str
+                The name of the category we want to retrieve.
         Returns:
-            list
+            If name is None: list
                 A list of all the categories of the table.
+            If name is not None: dict
+                The category that we put in parameter.
         """
         if name is None:
             req = "SELECT * FROM Categories"
@@ -264,11 +278,11 @@ class StoreManager:
        update(store)
            Updates a store of the table.
 
-       select()
+       select(name)
            Get all the stores of the table in a list and
             return this list.
 
-       get()
+       get(id_store)
            Get a store from the table and returns it.
     """
 
@@ -328,16 +342,28 @@ class StoreManager:
 
     def select(self, name=None):
         """
-        Get all the stores of the table in a list and
-         return this list.
+        Get all the stores from the table, or just a given store,
+         and return them.
 
-        Execute the SQL request which retrieves all the stores from
+        If there is no store given in the "name" parameter:
+        Execute the SQL query which retrieves all the stores from
          the table, transforms each store into a dictionary comprising
          the ID and the name, and returns a list of all these stores.
+        If there is a store given in the "name" parameter:
+        Execute the SQL query which retrieves the store, given as a
+         parameter, of the table, transforms it into a dictionary comprising
+         an ID and a name, and returns it.
+
+        Parameters:
+            name: str
+                The name of the store we want to retrieve.
 
         Returns:
-            list
-                A list of all the stores of the table.
+            If name is None: list
+                A list of all the stores of the table or just the given store.
+            If name is not None: dict
+                The store that we set as a parameter.
+
         """
         if name is None:
             req = "SELECT * FROM Store"
@@ -393,13 +419,13 @@ class ProductManager:
        delete(id_delete)
            Delete a product from the table.
 
-       insert(product)
+       insert(pcm, psm, product, list_prod)
            Insert a product into the table.
 
        update(product)
            Updates a product of the table.
 
-       select()
+       select(name)
            Get all the products of the table in a list and
             return this list.
 
@@ -434,14 +460,32 @@ class ProductManager:
 
     def insert(self, pcm, psm, product=None, list_prod=None):
         """
-        Insert a product into the table.
+        Insert a product or a product list into the table.
 
-        Execute the SQL request which allows to insert a product
-         in the table.
+        If there is a product indicated in the "product" parameter:
+        Executes the SQL query which inserts the product, given as a
+         parameter, into the table. Assigns an ID and returns it.
+        If there is a product list indicated in the "list_prod" parameter:
+        Execute the SQL query which inserts a product in the table, for each
+         product of the list given in parameter.
+        Assigns them an ID and returns them.
 
         Parameters:
+            pcm : class ProductCategoryManager
+                The manager of the ProductCategory table in the database.
+
+            psm : class ProductStoreManager
+                The manager of the ProductStore table in the database.
+
             product: dict
-                The product we want to insert in the table.
+                The product we want to insert into the table.
+
+            list_prod: list
+                The list of products that we want to insert into the table.
+
+        Returns:
+            dict
+                The product that we have inserted in the table.
         """
         if product is not None:
             check = self.select(pcm, psm, name=product["name"])
@@ -505,18 +549,37 @@ class ProductManager:
 
     def select(self, pcm, psm, name=None):
         """
-        Get all the products of the table in a list and
-        return this list.
+        Get all the products, or just a product given as a parameter,
+         of the table in a list and return them.
 
+        If name is None:
         Execute the SQL request which retrieves all the products from
          the table, transforms each product into a dictionary comprising
          the ID, the name, the brand, the categories, the nutri-score,
          the stores and the ingredients.
          And returns a list of all these products.
+        If name is not None:
+        Execute the SQL request which retrieves the products given in
+         parameter from the table, transforms this product into a dictionary
+         comprising the ID, the name, the brand, the categories,
+         the nutri-score, the stores and the ingredients.
+        And returns it.
+
+        Parameters:
+            pcm : class ProductCategoryManager
+                The manager of the ProductCategory table in the database.
+
+            psm : class ProductStoreManager
+                The manager of the ProductStore table in the database.
+
+            name : str
+                The name of the product that we want to recover.
 
         Returns:
-            list
+            If name ise None :list
                 A list of all the products of the table.
+            If name is not None: dict
+                The product that we put in parameter.
        """
         if name is None:
             req = "SELECT * FROM Product"
@@ -567,8 +630,7 @@ class ProductManager:
 
         Returns:
              dict
-                A dictionary that represents a product with the Id and the
-                 name.
+                A dictionary that represents a product.
         """
         req = "SELECT name_product, brand, category, nutri_score, store, " \
               "ingredient, url FROM Product " \
@@ -598,8 +660,11 @@ class ProductCategoryManager:
         insert_association(id_cat, id_product)
             Insert the association of a product with a category.
 
-        select_association(id_product)
-            Get the association of a product with a category.
+        select_association_with_id_prod(id_product)
+            Get the association of a product with categories.
+
+        select_association_whit_cat(category_name)
+            Get the association of a category to products.
     """
     def __init__(self, connector):
         """
@@ -640,7 +705,7 @@ class ProductCategoryManager:
 
         Returns:
             list
-                A list of the associations of a product with its categories.
+               A list of categories associated with the product.
         """
         req = "SELECT Categories.name_cat  " \
               "FROM Product " \
@@ -656,6 +721,21 @@ class ProductCategoryManager:
         return list_cat
 
     def select_association_with_cat(self, category_name):
+        """
+        Get the association of a category to products.
+
+        Execute the SQL query which retrieves the products associated with
+         the given category. And returns a list of these products.
+
+        Parameters:
+            category_name: str
+                The name of the category from which we want to retrieve
+                 the products associated with it.
+
+        Returns:
+            list
+                The list of products associated with the given category.
+        """
         req = "SELECT Product.id,Product.name_product,Product.nutri_score " \
               "FROM Product " \
               "INNER JOIN ProductCategory " \
@@ -682,7 +762,7 @@ class ProductStoreManager:
 
     Methods:
 
-        insert_association(id_cat, id_product)
+        insert_association(id_store, id_product)
             Insert the association of a product with a category.
 
         select_association(id_product)
@@ -756,8 +836,12 @@ class SubstituteManager:
             insert_association(id_sub, id_product)
                 Insert the association of a product with a substitute.
 
-            select_association(id_product)
+            select_association(id_product, psm, pcm)
                 Get the association of a product with a substitute.
+
+            select_substituted_product()
+
+            associate_substitute_to_product(pm, cm, sm, pcm, psm, api, product)
         """
 
     def __init__(self, connector):
@@ -790,16 +874,25 @@ class SubstituteManager:
               "VALUES (%s, %s)"
         self.connector.execute(req, (id_product, id_sub))
 
-    def select_association(self, id_product, psm, pcm, pm):
+    def select_association(self, id_product, pcm, psm):
         """
         Get the associations of a product with its substitute and return them.
 
         Execute the SQL request which retrieves the associations of a product
          with its substitutes. And returns a list of its associations.
 
+        Parameters:
+            id_product: int
+                The ID number of the product which we want to recover its substitutes.
+
+            pcm : class ProductCategoryManager
+                The manager of the ProductCategory table in the database.
+
+            psm : class ProductStoreManager
+                The manager of the ProductStore table in the database.
         Returns:
             list
-                A list of the associations of a product with its substitutes.
+                The list of substitutes for the product.
         """
         req = "SELECT Product.id, Product.name_product, Product.nutri_score, Product.url  " \
               "FROM Product " \
@@ -816,6 +909,16 @@ class SubstituteManager:
         return list_sub
 
     def select_substituted_product(self):
+        """
+        Get a list of products with a substitute.
+
+        Execute the SQL query which retrieves the list of products with
+         a substitute. And return this list.
+
+        Returns
+            list
+                The list of products with a substitute.
+        """
         req = "SELECT id_product, Product.name_product " \
               "FROM Substitute " \
               "INNER JOIN Product ON Product.id=Substitute.id_product"
@@ -832,28 +935,40 @@ class SubstituteManager:
 
         Get a list of all the database products.
         Get a list of all the product categories.
-        Retrieves the products having one of the categories of the product
-         in parameter.
-        If the list contains products, check if their nutriscore is lower than
-         that of the product in parameter.
-        If it's lower, associate the product as a substitute for the product
-         that we have put in parameter and return True.
-        If the list is empty returns False.
+        Retrieves a list of products from the database, having one of the
+         categories and a nutri-score lower than that of the product you want
+         to substitute.
+        If the list of products is full:
+        Return it.
+        If the list of products is empty:
+        Searches the OpenFoodFact API for substitutes and returns a list of
+         its substitutes.
 
         Parameters:
             pm : class ProductManager
                 The manager of the Product table in the database.
+
+            cm : class CategoryManager
+                The manager of the Categories table in the database.
+
+            sm : class StoreManager
+                The Manager of the Categories table in the database.
+
             pcm : class ProductCategoryManager
                 The manager of the ProductCategory table in the database.
-            subm : class SubstituteManager
-                The manager of the Substitute table in the database.
+
+            psm : class ProductStoreManager
+                The manager of the ProductStore table in the database.
+
+            api : Class ApiManagerSearch
+                The manager of the OpenFoodFact API research manager.
+
             product : dict
                 The product to whiwh we want to associate a store.
 
         Returns:
-            boolean
-                True if there is a list of substitutes and false if the list of
-                 substitutes is empty.
+            list
+                The list of possible substitutes for the product.
         """
         list_product_bdd = pm.select(pcm, psm)
         list_cat_product = pcm.select_association_with_id_prod(product["id"])
