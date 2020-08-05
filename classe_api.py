@@ -23,12 +23,12 @@ class ApiManageSearch:
 
     def search_product(self, name_product):
         """
-        Search a product in OpenFoodFact API and return the first
-         three products found.
+        Search a product in OpenFoodFact API and return a list of products
+         found.
 
-        Complete the link with the name of the product you are looking for,
-         search for the corresponding products and return the first
-         three products found.
+        Complete the link with the name of the product we are looking for,
+         search for the corresponding products and return a list of products
+         found.
 
         Parameters:
             name_product: str
@@ -36,13 +36,13 @@ class ApiManageSearch:
 
         Returns:
             list
-                Alist of the first three product found.
+                A list of products found by the API.
         """
         final_http = self.api_search_terms + name_product
         response = requests.get(final_http)
         response_text = json.loads(response.text)
         i = 0
-        list_product = []
+        product_list = []
         while i < len(response_text):
             try:
                 path = response_text["products"][i]
@@ -56,12 +56,12 @@ class ApiManageSearch:
                                      "ingredients_text", None),
                                  "url": path.get("url", None)}
                 if final_product["url"] is None:
-                    beginning = "https://fr.openfoodfacts.org/produit/"
+                    start = "https://fr.openfoodfacts.org/produit/"
                     id_prod = path["code"]
-                    final_product["url"] = beginning + id_prod
-                list_product.append(final_product)
+                    final_product["url"] = start + id_prod
+                product_list.append(final_product)
                 i += 1
             except IndexError:
                 i += 1
                 pass
-        return list_product
+        return product_list
