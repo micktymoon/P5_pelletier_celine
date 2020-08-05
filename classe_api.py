@@ -48,10 +48,12 @@ class ApiManageSearch:
                 path = response_text["products"][i]
                 final_product = {"name": path["product_name"],
                                  "brand": path.get("brands", None),
-                                 "category": get_word_remove_spaces(path.get("categories", None)),
+                                 "category": get_word_remove_spaces(
+                                     path.get("categories", None)),
                                  "nutriscore": path.get(
                                      "nutriscore_grade", None),
-                                 "store": get_word_remove_spaces(path.get("stores", None)),
+                                 "store": get_word_remove_spaces(
+                                     path.get("stores", None)),
                                  "ingredients": path.get(
                                      "ingredients_text", None),
                                  "url": path.get("url", None)}

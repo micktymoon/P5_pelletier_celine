@@ -502,7 +502,8 @@ class ProductManager:
                 return product
             else:
                 print("Ce produit existe déjà dans la base de donnée.")
-                print("Produit n°{}, nom: {}".format(check["id"], check["name"]))
+                print("Produit n°{}, nom: {}".format(check["id"],
+                                                     check["name"]))
                 return check
         if list_prod is not None:
             for product in list_prod:
@@ -510,7 +511,8 @@ class ProductManager:
                 if check is None:
                     req = "INSERT INTO Product " \
                           "(name_product, brand, category, nutri_score, " \
-                          "store, ingredient, url) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                          "store, ingredient, url) " \
+                          "VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     id_ = self.connector.execute(req, (product["name"],
                                                        product["brand"],
                                                        product["category"],
@@ -522,7 +524,8 @@ class ProductManager:
                     return product
                 else:
                     print("Ce produit existe déjà dans la base de donnée.")
-                    print("Produit n°{}, nom: {}".format(check["id"], check["name"]))
+                    print("Produit n°{}, nom: {}".format(check["id"],
+                                                         check["name"]))
                     return check
 
     def update(self, product):
@@ -592,8 +595,10 @@ class ProductManager:
                                   "nutriscore": product[4],
                                   "ingredient": product[6],
                                   "url": product[7]}
-                product_return["category"] = pcm.select_association_with_id_prod(product_return["id"])
-                product_return["store"] = psm.select_association(product_return["id"])
+                product_return["category"] = \
+                    pcm.select_asso_with_id_prod(product_return["id"])
+                product_return["store"] = \
+                    psm.select_association(product_return["id"])
                 list_product.append(product_return)
             return list_product
         if name is not None:
@@ -603,15 +608,15 @@ class ProductManager:
                       "FROM Product " \
                       "WHERE name_product=%s;"
                 response = self.connector.select(req, (name,))
-                product = {"id": response[0][0],
-                           "name": response[0][1],
-                           "brand": response[0][2],
-                           "nutriscore": response[0][4],
-                           "ingredient": response[0][6],
-                           "url": response[0][7]}
-                product["category"] = pcm.select_association_with_id_prod(product["id"])
-                product["store"] = psm.select_association(product["id"])
-                return product
+                prdct = {"id": response[0][0],
+                         "name": response[0][1],
+                         "brand": response[0][2],
+                         "nutriscore": response[0][4],
+                         "ingredient": response[0][6],
+                         "url": response[0][7]}
+                prdct["category"] = pcm.select_asso_with_id_prod(prdct["id"])
+                prdct["store"] = psm.select_association(prdct["id"])
+                return prdct
             except IndexError:
                 return None
 
@@ -696,7 +701,7 @@ class ProductCategoryManager:
               "VALUES (%s, %s)"
         self.connector.execute(req, (id_product, id_cat))
 
-    def select_association_with_id_prod(self, id_product):
+    def select_asso_with_id_prod(self, id_product):
         """
         Get the associations of a product with its categories and return them.
 
@@ -720,7 +725,7 @@ class ProductCategoryManager:
             list_cat.append(cat[0])
         return list_cat
 
-    def select_association_with_cat(self, category_name):
+    def select_asso_with_cat(self, category_name):
         """
         Get the association of a category to products.
 
@@ -883,7 +888,8 @@ class SubstituteManager:
 
         Parameters:
             id_product: int
-                The ID number of the product which we want to recover its substitutes.
+                The ID number of the product which we want to recover
+                 its substitutes.
 
             pcm : class ProductCategoryManager
                 The manager of the ProductCategory table in the database.
@@ -894,7 +900,8 @@ class SubstituteManager:
             list
                 The list of substitutes for the product.
         """
-        req = "SELECT Product.id, Product.name_product, Product.nutri_score, Product.url  " \
+        req = "SELECT Product.id, Product.name_product, " \
+              "Product.nutri_score, Product.url  " \
               "FROM Product " \
               "INNER JOIN Substitute " \
               "ON Product.id = Substitute.id_product_substitute " \
@@ -902,10 +909,13 @@ class SubstituteManager:
         response = self.connector.select(req, (id_product,))
         list_sub = []
         for sub in response:
-            substitute = {"id": sub[0], "name": sub[1], "nutriscore": sub[2], "url": sub[3]}
-            substitute["store"] = psm.select_association(substitute["id"])
-            substitute["category"] = pcm.select_association_with_id_prod(substitute["id"])
-            list_sub.append(substitute)
+            substi = {"id": sub[0],
+                      "name": sub[1],
+                      "nutriscore": sub[2],
+                      "url": sub[3]}
+            substi["store"] = psm.select_association(substi["id"])
+            substi["category"] = pcm.select_asso_with_id_prod(substi["id"])
+            list_sub.append(substi)
         return list_sub
 
     def select_substituted_product(self):
@@ -929,7 +939,7 @@ class SubstituteManager:
             list_prod.append(product)
         return list_prod
 
-    def associate_substitute_to_product(self, pm, cm, sm, pcm, psm, api, product):
+    def associate_sub_to_prod(self, pm, cm, sm, pcm, psm, api, product):
         """
         Associate a substitue to a product in the database.
 
@@ -971,11 +981,11 @@ class SubstituteManager:
                 The list of possible substitutes for the product.
         """
         list_product_bdd = pm.select(pcm, psm)
-        list_cat_product = pcm.select_association_with_id_prod(product["id"])
+        list_cat_product = pcm.select_asso_with_id_prod(product["id"])
         list_substitute_possible = []
 
         for prod in list_product_bdd:
-            prod["category"] = pcm.select_association_with_id_prod(prod["id"])
+            prod["category"] = pcm.select_asso_with_id_prod(prod["id"])
             match = False
             for cat in prod["category"]:
                 if cat in list_cat_product:
