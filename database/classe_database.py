@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
 
-from function_updating_db import insert_product_db
+from database.function_updating_db import insert_product_db
 
 
 class DatabaseManager:
@@ -84,31 +84,25 @@ class DatabaseManager:
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
         CREATE TABLE ProductCategory (
             id_product INT UNSIGNED NOT NULL,
-            id_product_cat INT UNSIGNED NOT NULL
+            id_product_cat INT UNSIGNED NOT NULL,
+            FOREIGN KEY (id_product) REFERENCES Product(id),
+            FOREIGN KEY (id_product_cat) REFERENCES Category(id)
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
         CREATE TABLE Substitute (
             id_product INT UNSIGNED NOT NULL,
-            id_product_substitute INT UNSIGNED NOT NULL
+            id_product_substitute INT UNSIGNED NOT NULL,
+            FOREIGN KEY (id_product) REFERENCES Product(id),
+            FOREIGN KEY (id_product_substitute) REFERENCES Product(id)
             )
             ENGINE=InnoDB DEFAULT CHARSET=utf8;
         CREATE TABLE ProductStore (
             id_product INT UNSIGNED NOT NULL,
-            id_product_store INT UNSIGNED NOT NULL
+            id_product_store INT UNSIGNED NOT NULL,
+            FOREIGN KEY (id_product) REFERENCES Product(id),
+            FOREIGN KEY (id_product_store) REFERENCES Store(id)
             )
-            ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ALTER TABLE ProductCategory ADD CONSTRAINT fk_idproduct
-        FOREIGN KEY (id_product) REFERENCES Product(id);
-        ALTER TABLE ProductCategory ADD CONSTRAINT fk_id_product_cat
-        FOREIGN KEY (id_product_cat) REFERENCES Category(id);
-        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product
-        FOREIGN KEY (id_product) REFERENCES Product(id);
-        ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_substitute
-        FOREIGN KEY (id_product_substitute) REFERENCES Product(id);
-        ALTER TABLE ProductStore ADD CONSTRAINT fk_idproduct
-        FOREIGN KEY (id_product) REFERENCES Product(id);
-        ALTER TABLE ProductStore ADD CONSTRAINT fk_id_product_store
-        FOREIGN KEY (id_product_store) REFERENCES Store(id);"""
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;"""
         self.connector.execute(req, multi=1)
 
 

@@ -34,7 +34,7 @@ def input_int(text):
 
     Parameters:
         text : str
-            The data that the user enters into the program.
+            The resource that the user enters into the program.
 
     Returns:
         int

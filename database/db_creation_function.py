@@ -2,9 +2,9 @@
 # -*-coding: utf8 -*-
 
 import mysql.connector
-from classe_mysqlconnector import MysqlConnector
-from classe_database import DatabaseManager, CategoryManager
-from function_updating_db import get_store_and_add_to_db, \
+from database.classe_mysqlconnector import MysqlConnector
+from database.classe_database import DatabaseManager, CategoryManager
+from database.function_updating_db import get_store_and_add_to_db, \
     associate_cat_to_product, associate_store_to_product
 
 

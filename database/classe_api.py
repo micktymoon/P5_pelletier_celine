@@ -3,7 +3,7 @@
 
 import json
 import requests
-from tool_function import get_word_remove_spaces
+from database.tool_function import get_word_remove_spaces
 
 
 class ApiManageSearch:

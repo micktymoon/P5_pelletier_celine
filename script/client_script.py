@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
-from classe_mysqlconnector import MysqlConnector
-from classe_database import CategoryManager, ProductManager, \
+
+from database.classe_mysqlconnector import MysqlConnector
+from database.classe_database import CategoryManager, ProductManager, \
     ProductCategoryManager, ProductStoreManager, SubstituteManager
-from classe_api import ApiManageSearch
-from classe_ui import UserInterfaceManager
+from database.classe_api import ApiManageSearch
+from User_interface.classe_ui import UserInterfaceManager
 
 
 def main():

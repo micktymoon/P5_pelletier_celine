@@ -2,12 +2,12 @@
 # -*-coding: utf8 -*-
 
 import mysql.connector
-from classe_mysqlconnector import MysqlConnector
-from classe_database import CategoryManager, ProductManager, StoreManager,\
-    ProductCategoryManager, ProductStoreManager
-from classe_api import ApiManageSearch
-from db_creation_function import create_db_and_table, insert_first_cat,\
-    fill_db
+from database.classe_mysqlconnector import MysqlConnector
+from database.classe_database import CategoryManager, ProductManager, \
+    StoreManager, ProductCategoryManager, ProductStoreManager
+from database.classe_api import ApiManageSearch
+from database.db_creation_function import create_db_and_table, \
+    insert_first_cat, fill_db
 
 
 def main():

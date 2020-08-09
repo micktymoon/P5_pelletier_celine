@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
 
-from tool_function import input_int
+from database.tool_function import input_int
 
 
 class UserInterfaceManager:
