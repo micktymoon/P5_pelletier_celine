@@ -6,10 +6,14 @@ from classe_mysqlconnector import MysqlConnector
 from classe_database import CategoryManager, ProductManager, StoreManager,\
     ProductCategoryManager, ProductStoreManager
 from classe_api import ApiManageSearch
-from db_creation_function import create_db_and_table, insert_first_cat, fill_db
+from db_creation_function import create_db_and_table, insert_first_cat,\
+    fill_db
 
 
 def main():
+    """
+    Create the database and fill it.
+    """
     create_db_and_table()
     connector = MysqlConnector("localhost", "root", "cP93*mR78.")
     connector.use_db()
@@ -32,7 +36,6 @@ def main():
         fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod)
     except mysql.connector.errors.InternalError:
         fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod)
-
 
 
 if __name__ == "__main__":
