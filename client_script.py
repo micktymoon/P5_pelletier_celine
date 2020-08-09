@@ -1,12 +1,16 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
 from classe_mysqlconnector import MysqlConnector
-from classe_database import CategoryManager, ProductManager, ProductCategoryManager, ProductStoreManager, SubstituteManager
+from classe_database import CategoryManager, ProductManager, \
+    ProductCategoryManager, ProductStoreManager, SubstituteManager
 from classe_api import ApiManageSearch
 from classe_ui import UserInterfaceManager
 
 
 def main():
+    """
+    Run the program.
+    """
     connector = MysqlConnector("localhost", "root", "cP93*mR78.")
     connector.use_db()
     api = ApiManageSearch()
