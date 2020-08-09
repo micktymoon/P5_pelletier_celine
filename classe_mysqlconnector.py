@@ -14,7 +14,6 @@ class MysqlConnector:
             The password of the user we use to connect to MySQL.
 
     Methods:
-
         execute(req, info=(), **kwargs)
             Execute a SQL request and return an id if an id is created
              with the request.
@@ -105,7 +104,7 @@ class MysqlConnector:
     def use_db(self):
         """
         Try to use the database, if the database exists it returns
-             True else it returns False.
+         True else it returns False.
 
         Create the cursor we need for the execution.
         Try to use the database 'purBeurre', if it works it returns True
@@ -115,7 +114,6 @@ class MysqlConnector:
         Returns:
             boolean
                 True if the request works and False if it doesn't works.
-
         """
         cursor = self.connexion.cursor()
         try:
