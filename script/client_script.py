@@ -5,7 +5,7 @@ from database.classe_mysqlconnector import MysqlConnector
 from database.classe_database import CategoryManager, ProductManager, \
     ProductCategoryManager, ProductStoreManager, SubstituteManager
 from database.classe_api import ApiManageSearch
-from User_interface.classe_ui import UserInterfaceManager
+from user_interface.classe_ui import UserInterfaceManager
 
 
 def main():
