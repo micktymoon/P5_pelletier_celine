@@ -60,7 +60,7 @@ class DatabaseManager:
          database needs.
         """
         req = """
-        CREATE TABLE Categories (
+        CREATE TABLE Category (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             name_cat VARCHAR(255) NOT NULL,
             PRIMARY KEY (id)
@@ -100,7 +100,7 @@ class DatabaseManager:
         ALTER TABLE ProductCategory ADD CONSTRAINT fk_idproduct
         FOREIGN KEY (id_product) REFERENCES Product(id);
         ALTER TABLE ProductCategory ADD CONSTRAINT fk_id_product_cat
-        FOREIGN KEY (id_product_cat) REFERENCES Categories(id);
+        FOREIGN KEY (id_product_cat) REFERENCES Category(id);
         ALTER TABLE Substitute ADD CONSTRAINT fk_id_product
         FOREIGN KEY (id_product) REFERENCES Product(id);
         ALTER TABLE Substitute ADD CONSTRAINT fk_id_product_substitute
@@ -161,7 +161,7 @@ class CategoryManager:
                 The ID number of the category we want to delete
                  from the table.
         """
-        req = "DELETE FROM Categories WHERE id = %s"
+        req = "DELETE FROM Category WHERE id = %s"
         self.connector.execute(req, (id_delete,))
 
     def insert(self, category):
@@ -175,7 +175,7 @@ class CategoryManager:
             category: dict
                 The category we want to insert in the table.
         """
-        req = "INSERT INTO Categories (name_cat) VALUES (%s)"
+        req = "INSERT INTO Category (name_cat) VALUES (%s)"
         id_ = self.connector.execute(req, (category["name"],))
         category["id"] = id_
 
@@ -190,7 +190,7 @@ class CategoryManager:
                 The category we want to update in the table.
         """
         infos = (category["name"], category["id"])
-        req = "UPDATE Categories SET name_cat= %s WHERE id = %s"
+        req = "UPDATE Category SET name_cat= %s WHERE id = %s"
         self.connector.execute(req, infos)
 
     def select(self, name=None):
@@ -218,7 +218,7 @@ class CategoryManager:
                 The category that we put in parameter.
         """
         if name is None:
-            req = "SELECT * FROM Categories"
+            req = "SELECT * FROM Category"
             response = self.connector.select(req)
             list_cat = []
             for cat in response:
@@ -227,7 +227,7 @@ class CategoryManager:
             return list_cat
         if name is not None:
             try:
-                req = "SELECT id, name_cat FROM Categories " \
+                req = "SELECT id, name_cat FROM Category " \
                       "WHERE name_cat=%s;"
                 response = self.connector.select(req, (name,))
                 category = {"id": response[0][0], "name": response[0][1]}
@@ -252,7 +252,7 @@ class CategoryManager:
                 A dictionary that represents a category with the Id
                  and the name.
         """
-        req = "SELECT name_cat FROM Categories WHERE id = %s"
+        req = "SELECT name_cat FROM Category WHERE id = %s"
         response = self.connector.select(req, (id_cat,))
         category = {"id": id_cat, "name": response[0][0]}
         return category
@@ -701,12 +701,12 @@ class ProductCategoryManager:
             list
                A list of categories associated with the product.
         """
-        req = "SELECT Categories.name_cat  " \
+        req = "SELECT Category.name_cat  " \
               "FROM Product " \
               "INNER JOIN ProductCategory " \
               "ON ProductCategory.id_product = Product.id " \
-              "INNER JOIN Categories " \
-              "ON Categories.id = ProductCategory.id_product_cat  " \
+              "INNER JOIN Category " \
+              "ON Category.id = ProductCategory.id_product_cat  " \
               "WHERE Product.id = %s"
         response = self.connector.select(req, (id_product,))
         list_cat = []
@@ -734,9 +734,9 @@ class ProductCategoryManager:
               "FROM Product " \
               "INNER JOIN ProductCategory " \
               "ON ProductCategory.id_product = Product.id " \
-              "INNER JOIN Categories " \
-              "ON Categories.id = ProductCategory.id_product_cat " \
-              "WHERE Categories.name_cat = %s"
+              "INNER JOIN Category " \
+              "ON Category.id = ProductCategory.id_product_cat " \
+              "WHERE Category.name_cat = %s"
 
         response = self.connector.select(req, (category_name,))
         list_prod = []
