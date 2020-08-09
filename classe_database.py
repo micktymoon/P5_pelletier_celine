@@ -76,9 +76,7 @@ class DatabaseManager:
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             name_product VARCHAR(255) NOT NULL,
             brand VARCHAR(255),
-            category TEXT,
             nutri_score VARCHAR(2),
-            store TEXT,
             ingredient TEXT,
             url TEXT,
             PRIMARY KEY (id)
@@ -509,14 +507,11 @@ class ProductManager:
                 check = self.select(pcm, psm, name=product["name"])
                 if check is None:
                     req = "INSERT INTO Product " \
-                          "(name_product, brand, category, nutri_score, " \
-                          "store, ingredient, url) " \
-                          "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                          "(name_product, brand, nutri_score, ingredient," \
+                          " url) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     id_ = self.connector.execute(req, (product["name"],
                                                        product["brand"],
-                                                       product["category"],
                                                        product["nutri_score"],
-                                                       product["store"],
                                                        product["ingredients"],
                                                        product["url"]))
                     product["id"] = id_
@@ -537,14 +532,12 @@ class ProductManager:
             product: dict
                 The product we want to update in the table.
         """
-        req = "UPDATE Product SET name_product=%s, brand=%s, category=%s, " \
-              "nutri_score=%s, store=%s, ingredient=%s, url=%s" \
+        req = "UPDATE Product SET name_product=%s, brand=%s, " \
+              "nutri_score=%s, ingredient=%s, url=%s" \
               "WHERE id=%s"
         self.connector.execute(req, (product["name"],
                                      product["brand"],
-                                     product["category"],
                                      product["nutri_score"],
-                                     product["store"],
                                      product["ingredient"],
                                      product["url"],
                                      product["id"]))
@@ -591,9 +584,9 @@ class ProductManager:
                 product_return = {"id": product[0],
                                   "name": product[1],
                                   "brand": product[2],
-                                  "nutriscore": product[4],
-                                  "ingredient": product[6],
-                                  "url": product[7]}
+                                  "nutriscore": product[3],
+                                  "ingredient": product[4],
+                                  "url": product[5]}
                 product_return["category"] = \
                     pcm.select_asso_with_id_prod(product_return["id"])
                 product_return["store"] = \
@@ -602,17 +595,17 @@ class ProductManager:
             return list_product
         if name is not None:
             try:
-                req = "SELECT id, name_product, brand, category, " \
-                      "nutri_score, store, ingredient, url " \
+                req = "SELECT id, name_product, brand, " \
+                      "nutri_score, ingredient, url " \
                       "FROM Product " \
                       "WHERE name_product=%s;"
                 response = self.connector.select(req, (name,))
                 prdct = {"id": response[0][0],
                          "name": response[0][1],
                          "brand": response[0][2],
-                         "nutriscore": response[0][4],
-                         "ingredient": response[0][6],
-                         "url": response[0][7]}
+                         "nutriscore": response[0][3],
+                         "ingredient": response[0][4],
+                         "url": response[0][5]}
                 prdct["category"] = pcm.select_asso_with_id_prod(prdct["id"])
                 prdct["store"] = psm.select_association(prdct["id"])
                 return prdct
@@ -636,18 +629,16 @@ class ProductManager:
              dict
                 A dictionary that represents a product.
         """
-        req = "SELECT name_product, brand, category, nutri_score, store, " \
+        req = "SELECT name_product, brand, nutri_score, " \
               "ingredient, url FROM Product " \
               "WHERE Product.id = %s"
         select = self.connector.select(req, (id_product,))
         product = {"id": id_product,
                    "name": select[0][0],
                    "brand": select[0][1],
-                   "category": select[0][2],
-                   "nutriscore": select[0][3],
-                   "store": select[0][4],
-                   "ingredient": select[0][5],
-                   "url": select[0][6]}
+                   "nutriscore": select[0][2],
+                   "ingredient": select[0][3],
+                   "url": select[0][4]}
         return product
 
 
