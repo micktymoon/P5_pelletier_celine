@@ -29,12 +29,12 @@ def input_int(text):
 
     Asks the user to enter a number and verifies that what they entered
      is a number.
-     Returns the result if it is a number.
-     Displays an error message if the result is not a number.
+    Returns the result if it is a number.
+    Displays an error message if the result is not a number.
 
     Parameters:
-    text : str
-        The data that the user enters into the program.
+        text : str
+            The data that the user enters into the program.
 
     Returns:
         int
