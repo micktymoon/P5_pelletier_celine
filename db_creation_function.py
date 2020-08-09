@@ -32,11 +32,11 @@ def insert_first_cat(list_categories, connector):
     Insert a first list of categories in the database.
 
     Parameters:
-    list_categories : list
-        The list of categories that we want to enter in the database.
+        list_categories : list
+            The list of categories that we want to enter in the database.
 
-    connector : Class MysqlConnector
-        The database connector.
+        connector : Class MysqlConnector
+            The database connector.
     """
     for cat in list_categories:
         category = {"name": cat}
@@ -50,9 +50,10 @@ def fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod):
     Fills the database with a list of products, associates stores and
      categories with their products.
 
-    Retrieves products for each product name in the list.
-    For each product, retrieves stores and categories and adds them to the
-     database, then associates the product with its stores and categories.
+    Looks up the products in the name list in the API and retrieves them.
+    For each product recovered:
+    Retrieves, inserts and associates stores and categories in the database,
+     and inserts the product into the database.
 
     Parameters
     ----------
@@ -116,10 +117,11 @@ def fill_db(api_search, cm, sm, pm, pcm, psm, list_name_prod):
                 associate_cat_to_product(cm, pcm, product)
                 print("Association des catégories réalisée avec succès.")
             try:
-                product["category"] = pcm.select_association_with_id_prod(product["id"])
+                product["category"] = \
+                    pcm.select_asso_with_id_prod(product["id"])
             except mysql.connector.errors.InternalError as er:
                 print("Problème de récupération des catégories.")
                 print(er)
-                product["category"] = pcm.select_association_with_id_prod(product["id"])
+                product["category"] = \
+                    pcm.select_asso_with_id_prod(product["id"])
                 print("Récupération des catégories réalisée avec succès.")
-
