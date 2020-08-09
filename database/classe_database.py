@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*-coding: utf8 -*-
 
+import mysql.connector.errors
 from database.function_updating_db import insert_product_db
 
 
@@ -85,6 +86,7 @@ class DatabaseManager:
         CREATE TABLE ProductCategory (
             id_product INT UNSIGNED NOT NULL,
             id_product_cat INT UNSIGNED NOT NULL,
+            PRIMARY KEY (id_product, id_product_cat),
             FOREIGN KEY (id_product) REFERENCES Product(id),
             FOREIGN KEY (id_product_cat) REFERENCES Category(id)
             )
@@ -92,6 +94,7 @@ class DatabaseManager:
         CREATE TABLE Substitute (
             id_product INT UNSIGNED NOT NULL,
             id_product_substitute INT UNSIGNED NOT NULL,
+            PRIMARY KEY (id_product, id_product_substitute),
             FOREIGN KEY (id_product) REFERENCES Product(id),
             FOREIGN KEY (id_product_substitute) REFERENCES Product(id)
             )
@@ -99,6 +102,7 @@ class DatabaseManager:
         CREATE TABLE ProductStore (
             id_product INT UNSIGNED NOT NULL,
             id_product_store INT UNSIGNED NOT NULL,
+            PRIMARY KEY (id_product, id_product_store),
             FOREIGN KEY (id_product) REFERENCES Product(id),
             FOREIGN KEY (id_product_store) REFERENCES Store(id)
             )
@@ -680,9 +684,13 @@ class ProductCategoryManager:
                 The ID number of the product we want to insert into
                  the table.
         """
-        req = "INSERT INTO ProductCategory (id_product, id_product_cat)" \
-              "VALUES (%s, %s)"
-        self.connector.execute(req, (id_product, id_cat))
+        try:
+            req = "INSERT INTO ProductCategory (id_product, id_product_cat)" \
+                  "VALUES (%s, %s)"
+            self.connector.execute(req, (id_product, id_cat))
+        except mysql.connector.Error:
+            print("Cette catégorie est déjà associée à ce produit.")
+            pass
 
     def select_asso_with_id_prod(self, id_product):
         """
@@ -781,9 +789,13 @@ class ProductStoreManager:
                 The ID number of the product we want to insert into
                  the table.
         """
-        req = "INSERT INTO ProductStore (id_product, id_product_store)" \
-              "VALUES (%s, %s)"
-        self.connector.execute(req, (id_product, id_store))
+        try:
+            req = "INSERT INTO ProductStore (id_product, id_product_store)" \
+                  "VALUES (%s, %s)"
+            self.connector.execute(req, (id_product, id_store))
+        except mysql.connector.Error:
+            print("Ce magasin est déjà associé à ce produit.")
+            pass
 
     def select_association(self, id_product):
         """
@@ -860,9 +872,13 @@ class SubstituteManager:
                 The ID number of the substitute we want to insert into
                  the table.
         """
-        req = "INSERT INTO Substitute (id_product, id_product_substitute)" \
-              "VALUES (%s, %s)"
-        self.connector.execute(req, (id_product, id_sub))
+        try:
+            req = "INSERT INTO Substitute (id_product, id_product_substitute)" \
+                  "VALUES (%s, %s)"
+            self.connector.execute(req, (id_product, id_sub))
+        except mysql.connector.Error:
+            print("Ce substitut est déjà enregistré.")
+            pass
 
     def select_association(self, id_product, pcm, psm):
         """
