@@ -212,6 +212,7 @@ class CategoryManager:
         Parameters:
             name: str
                 The name of the category we want to retrieve.
+
         Returns:
             If name is None: list
                 A list of all the categories of the table.
@@ -268,7 +269,6 @@ class StoreManager:
            The database connector.
 
     Methods:
-
        delete(id_delete)
            Delete a store from the table.
 
@@ -415,7 +415,6 @@ class ProductManager:
            The database connector.
 
     Methods:
-
        delete(id_delete)
            Delete a product from the table.
 
@@ -661,7 +660,6 @@ class ProductCategoryManager:
            The database connector.
 
     Methods:
-
         insert_association(id_cat, id_product)
             Insert the association of a product with a category.
 
@@ -766,7 +764,6 @@ class ProductStoreManager:
            The database connector.
 
     Methods:
-
         insert_association(id_store, id_product)
             Insert the association of a product with a category.
 
@@ -778,8 +775,8 @@ class ProductStoreManager:
         ProductStoreManager class constructor.
 
         Parameters:
-          connector : Class MysqlConnector
-              The database connector.
+            connector : Class MysqlConnector
+                The database connector.
         """
         self.connector = connector
 
@@ -810,6 +807,10 @@ class ProductStoreManager:
         Execute the SQL request which retrieves the associations of a product
          with its stores. And returns a list of its associations.
 
+        Parameters:
+            id_product : int
+                The ID of the product whose stores we want to retrieve.
+
         Returns:
             list
                 A list of the associations of a product with its stores.
@@ -830,32 +831,31 @@ class ProductStoreManager:
 
 class SubstituteManager:
     """
-        Class which manages the Substitute table of the database.
+    Class which manages the Substitute table of the database.
 
-        Attributes:
-           connector : Class MysqlConnector
-               The database connector.
+    Attributes:
+       connector : Class MysqlConnector
+           The database connector.
 
-        Methods:
+    Methods:
+        insert_association(id_sub, id_product)
+            Insert the association of a product with a substitute.
 
-            insert_association(id_sub, id_product)
-                Insert the association of a product with a substitute.
+        select_association(id_product, psm, pcm)
+            Get the association of a product with a substitute.
 
-            select_association(id_product, psm, pcm)
-                Get the association of a product with a substitute.
+        select_substituted_product()
 
-            select_substituted_product()
-
-            associate_substitute_to_product(pm, cm, sm, pcm, psm, api, product)
-        """
+        associate_substitute_to_product(pm, cm, sm, pcm, psm, api, product)
+    """
 
     def __init__(self, connector):
         """
         SubstituteManager class constructor.
 
         Parameters:
-          connector : Class MysqlConnector
-              The database connector.
+            connector : Class MysqlConnector
+                The database connector.
         """
         self.connector = connector
 
@@ -896,6 +896,7 @@ class SubstituteManager:
 
             psm : class ProductStoreManager
                 The manager of the ProductStore table in the database.
+
         Returns:
             list
                 The list of substitutes for the product.
@@ -974,7 +975,7 @@ class SubstituteManager:
                 The manager of the OpenFoodFact API research manager.
 
             product : dict
-                The product to whiwh we want to associate a store.
+                The product to which we want to associate a store.
 
         Returns:
             list

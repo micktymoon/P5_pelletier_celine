@@ -50,9 +50,6 @@ class UserInterfaceManager:
 
         suggest_substitute(product)
             Displays the substitutes for the chosen product.
-
-        show_product_substituted()
-            Displays all products with a substitute.
     """
     def __init__(self, cm, pm, sm, pcm, psm, subm, api):
         """
