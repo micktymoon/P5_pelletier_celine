@@ -53,6 +53,9 @@ Vous avez besoin de :
 
 Dans une console :
 1. Aller dans le fichier script du fichier P5_pelletier_celine-master.
+```
+~$ cd chemin/vers/P5_pelletier_celine-master/script/
+```
 2. Démarrez client_script.py avec Python.
 ```
 ~$ python3 client_script.py
