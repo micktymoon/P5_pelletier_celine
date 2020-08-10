@@ -9,10 +9,10 @@ Projet 5 de la formation OpenClassRooms : Développeur d'application - Python
 ### Pré-requis : 
 
 Vous avez besoin de :
-  * Python3
-  * pip
-  * venv
-  * tout ce que le fichier .zip contient
+   * Python3
+   * pip
+   * venv
+   * tout ce que le fichier .zip contient
 
 ### Installation : 
 
@@ -59,9 +59,9 @@ Dans une console :
 ```
 ## Fabriqué avec
 
-  * Pycharm - IDE Python
-  * MySQL - Système de gestion de base de donnée relationnelles
-  * Github - outils de versionnage du projet
+   * Pycharm - IDE Python
+   * MySQL - Système de gestion de base de donnée relationnelles
+   * Github - outils de versionnage du projet
 
 ## Versions
 
