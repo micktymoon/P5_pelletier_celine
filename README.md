@@ -40,11 +40,7 @@ Vous avez besoin de :
 ```
 ~$ pip install -r requirements.txt
 ```
-9. Entrez dans le dossier script.
-```
-~$ cd script/
-```
-10. Créez la base de donnée.
+9. Créez la base de donnée.
 ```
 ~$ python3 db_creation_script.py
 ```
@@ -52,9 +48,9 @@ Vous avez besoin de :
 ## Démarrage
 
 Dans une console :
-1. Aller dans le fichier script du fichier P5_pelletier_celine-master.
+1. Aller dans le fichier P5_pelletier_celine-master.
 ```
-~$ cd chemin/vers/P5_pelletier_celine-master/script/
+~$ cd chemin/vers/P5_pelletier_celine-master/
 ```
 2. Démarrez client_script.py avec Python.
 ```
