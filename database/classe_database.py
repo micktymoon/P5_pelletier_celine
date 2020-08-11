@@ -931,7 +931,7 @@ class SubstituteManager:
             list
                 The list of products with a substitute.
         """
-        req = "SELECT id_product, Product.name_product " \
+        req = "SELECT DISTINCT id_product, Product.name_product " \
               "FROM Substitute " \
               "INNER JOIN Product ON Product.id=Substitute.id_product"
         response = self.connector.select(req)
