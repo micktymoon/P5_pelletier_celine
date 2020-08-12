@@ -282,6 +282,7 @@ class UserInterfaceManager:
         choice = input_int("\nEntrez le nombre du produit dont vous voulez "
                            "voir les susbtituts.")
         for product in list_substituted_prod:
+            print(product)
             if choice == product["id"]:
                 self.suggest_substitute(product)
             if choice == -1:
@@ -304,9 +305,10 @@ class UserInterfaceManager:
               "Voici les substituts sauvegardés pour "
               ": {}.".format(product["name"]))
         for sub in list_substitute:
-            print("Produit n°{}, nom: {}, nutriscore: {},\n "
+            print("Produit n°{}, nom: {}, marque: {}, nutriscore: {},\n "
                   "url : {}".format(sub["id"],
                                     sub["name"],
+                                    sub["brand"],
                                     sub["nutriscore"],
                                     sub["url"]))
         print("============================================== \n")

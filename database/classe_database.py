@@ -902,7 +902,7 @@ class SubstituteManager:
             list
                 The list of substitutes for the product.
         """
-        req = "SELECT Product.id, Product.name_product, " \
+        req = "SELECT Product.id, Product.name_product, Product.brand, " \
               "Product.nutri_score, Product.url  " \
               "FROM Product " \
               "INNER JOIN Substitute " \
@@ -913,8 +913,9 @@ class SubstituteManager:
         for sub in response:
             substi = {"id": sub[0],
                       "name": sub[1],
-                      "nutriscore": sub[2],
-                      "url": sub[3]}
+                      "brand": sub[2],
+                      "nutriscore": sub[3],
+                      "url": sub[4]}
             substi["store"] = psm.select_association(substi["id"])
             substi["category"] = pcm.select_asso_with_id_prod(substi["id"])
             list_sub.append(substi)
