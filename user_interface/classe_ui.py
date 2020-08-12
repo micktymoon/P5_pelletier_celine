@@ -211,10 +211,11 @@ class UserInterfaceManager:
                   "Voici la liste des substituts du produit: "
                   "{}\n".format(prod["name"]))
             for sub in list_sub:
-                print("Produit n°{}: {}, magasins où le trouver: {}, "
+                print("Produit n°{}: {}, marque: {}, magasins où le trouver: {}, "
                       "nutri-score: {}, url OpenFoodFact: "
                       "{}.".format(sub["id"],
                                    sub["name"],
+                                   sub["brand"],
                                    sub["store"],
                                    sub["nutriscore"],
                                    sub["url"]))
