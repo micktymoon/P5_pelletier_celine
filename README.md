@@ -16,10 +16,10 @@ Vous avez besoin de :
 
 ### Installation : 
 
-1. Télécharger le fichier P5_pelletier_celine-master.zip du repository suivant : 
+1. Téléchargez le fichier P5_pelletier_celine-master.zip du repository suivant : 
 [Liens vers P5_pelletier_celine-master.zip](https://github.com/micktymoon/P5_pelletier_celine.git)
 2. Ouvrez un terminal.
-3. Aller dans le dossier contenant le fichier .zip.
+3. Allez dans le dossier contenant le fichier .zip.
 ```
 ~$ cd chemin/vers/.zip
 ```
@@ -48,7 +48,7 @@ Vous avez besoin de :
 ## Démarrage
 
 Dans une console :
-1. Aller dans le fichier P5_pelletier_celine-master.
+1. Allez dans le fichier P5_pelletier_celine-master.
 ```
 ~$ cd chemin/vers/P5_pelletier_celine-master/
 ```
@@ -59,7 +59,7 @@ Dans une console :
 ## Fabriqué avec
 
    * Pycharm - IDE Python
-   * MySQL - Système de gestion de base de donnée relationnelles
+   * MySQL - Système de gestion de base de données relationnelles
    * Github - outils de versionnage du projet
 
 ## Versions
